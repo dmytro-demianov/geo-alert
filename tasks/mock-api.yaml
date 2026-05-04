@@ -1,0 +1,1220 @@
+openapi: 3.0.3
+info:
+  title: Geo-Alert API
+  version: "1.0"
+  description: |
+    Mock API spec для параллельной разработки frontend.
+    Все endpoints с примерами ответов. WebSocket описан в x-websocket-messages.
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:          { type: string, format: uuid, example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890" }
+        google_id:   { type: string, example: "108123456789012345678" }
+        email:       { type: string, format: email, example: "user@example.com" }
+        display_name: { type: string, example: "Дмитро Дем'янов" }
+        avatar_url:  { type: string, nullable: true, example: "https://storage.googleapis.com/geo-alert/avatars/a1b2.jpg" }
+        bio:         { type: string, maxLength: 150, nullable: true, example: "Люблю путешествовать" }
+        is_private:  { type: boolean, example: false }
+        created_at:  { type: string, format: date-time, example: "2026-05-01T10:00:00Z" }
+
+    Card:
+      type: object
+      properties:
+        id:               { type: string, format: uuid, example: "b2c3d4e5-f6a7-8901-bcde-f12345678901" }
+        owner_id:         { type: string, format: uuid, example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890" }
+        title:            { type: string, example: "Интересные места Киева" }
+        description:      { type: string, example: "Мои любимые места" }
+        privacy:          { type: string, enum: [PRIVATE, LINK_ONLY, PUBLIC], example: PUBLIC }
+        allow_contributors: { type: boolean, example: true }
+        radius:           { type: integer, example: 200, description: "Радиус в метрах для всех меток" }
+        timezone:         { type: string, example: "Europe/Kyiv" }
+        marker_count:     { type: integer, example: 12 }
+        subscriber_count: { type: integer, example: 34 }
+        created_at:       { type: string, format: date-time, example: "2026-05-01T10:00:00Z" }
+        updated_at:       { type: string, format: date-time, example: "2026-05-04T12:30:00Z" }
+
+    GeoMarker:
+      type: object
+      properties:
+        id:           { type: string, format: uuid, example: "c3d4e5f6-a7b8-9012-cdef-123456789012" }
+        card_id:      { type: string, format: uuid, example: "b2c3d4e5-f6a7-8901-bcde-f12345678901" }
+        created_by:   { type: string, format: uuid, example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890" }
+        title:        { type: string, maxLength: 200, example: "Золоті ворота" }
+        description:  { type: string, maxLength: 2000, example: "Пам'ятка архітектури XI ст." }
+        latitude:     { type: number, format: double, example: 50.4501 }
+        longitude:    { type: number, format: double, example: 30.5234 }
+        images:       { type: array, items: { type: string }, maxItems: 5, example: ["https://storage.googleapis.com/geo-alert/markers/img1.jpg"] }
+        tags:         { type: array, items: { type: string }, maxItems: 5, example: ["история", "архитектура"] }
+        like_weight:  { type: integer, example: 7, description: "likes - dislikes, может быть отрицательным" }
+        comment_count: { type: integer, example: 3 }
+        view_count:   { type: integer, example: 42, description: "Видит только создатель" }
+        allow_comments: { type: boolean, example: true }
+        allow_likes:   { type: boolean, example: true }
+        is_draft:      { type: boolean, example: false }
+        notification_type: { type: string, enum: [ON_ENTER, ON_APPROACH, BOTH], example: ON_ENTER }
+        expires_at:    { type: string, format: date-time, nullable: true, example: "2026-06-01T00:00:00Z" }
+        expiration_type: { type: string, enum: [ETERNAL, UNTIL_TIME, PERIOD, END_OF_DAY], example: UNTIL_TIME }
+        created_at:    { type: string, format: date-time, example: "2026-05-02T08:00:00Z" }
+        updated_at:    { type: string, format: date-time, example: "2026-05-04T14:00:00Z" }
+
+    Comment:
+      type: object
+      properties:
+        id:         { type: string, format: uuid, example: "d4e5f6a7-b8c9-0123-defa-234567890123" }
+        marker_id:  { type: string, format: uuid, example: "c3d4e5f6-a7b8-9012-cdef-123456789012" }
+        user_id:    { type: string, format: uuid, example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890" }
+        user:       { $ref: '#/components/schemas/User' }
+        text:       { type: string, maxLength: 500, example: "Відмінне місце!" }
+        mentions:   { type: array, items: { type: string, format: uuid }, example: [] }
+        created_at: { type: string, format: date-time, example: "2026-05-03T09:15:00Z" }
+
+    Notification:
+      type: object
+      properties:
+        id:               { type: string, format: uuid, example: "e5f6a7b8-c9d0-1234-efab-345678901234" }
+        type:
+          type: string
+          enum:
+            - GEO_ENTER
+            - GEO_APPROACH
+            - NEW_LIKE
+            - NEW_COMMENT
+            - NEW_MENTION
+            - CARD_PRIVATE
+            - MARKER_DELETED_IN_RADIUS
+            - REPORT_RECEIVED
+            - NEW_SUBSCRIBER
+          example: NEW_LIKE
+        message:          { type: string, example: "Хтось лайкнув вашу мітку «Золоті ворота»" }
+        related_marker_id: { type: string, format: uuid, nullable: true }
+        related_card_id:   { type: string, format: uuid, nullable: true }
+        related_user_id:   { type: string, format: uuid, nullable: true }
+        is_read:          { type: boolean, example: false }
+        created_at:       { type: string, format: date-time, example: "2026-05-04T10:00:00Z" }
+
+    Subscription:
+      type: object
+      properties:
+        id:             { type: string, format: uuid, example: "f6a7b8c9-d0e1-2345-fabc-456789012345" }
+        user_id:        { type: string, format: uuid }
+        target_card_id: { type: string, format: uuid, nullable: true }
+        target_user_id: { type: string, format: uuid, nullable: true }
+        created_at:     { type: string, format: date-time }
+
+    Pagination:
+      type: object
+      properties:
+        total:  { type: integer, example: 100 }
+        limit:  { type: integer, example: 20 }
+        offset: { type: integer, example: 0 }
+
+    Error:
+      type: object
+      properties:
+        error:   { type: string, example: "not_found" }
+        message: { type: string, example: "Resource not found" }
+
+security:
+  - BearerAuth: []
+
+paths:
+
+  # ── AUTH ──────────────────────────────────────────────────────────────────
+
+  /auth/google:
+    post:
+      tags: [Auth]
+      summary: Sign in with Google
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:           { type: string, example: "4/0AX4XfWh..." }
+                fingerprint:    { type: string, example: "abc123def456" }
+      responses:
+        "200":
+          description: Tokens issued
+          content:
+            application/json:
+              example:
+                access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAiLCJleHAiOjE3NDYzNzYwMDAsImlhdCI6MTc0NjM3NTEwMH0.signature"
+                refresh_token: "rt_abcdefghijklmnopqrstuvwxyz1234567890"
+                expires_in: 900
+                user:
+                  id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                  email: "user@example.com"
+                  display_name: "Дмитро Дем'янов"
+                  avatar_url: "https://lh3.googleusercontent.com/a/avatar"
+                  is_private: false
+        "401":
+          description: Invalid Google code
+          content:
+            application/json:
+              example: { error: "invalid_code", message: "Failed to exchange Google auth code" }
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token: { type: string, example: "rt_abcdefghijklmnopqrstuvwxyz1234567890" }
+      responses:
+        "200":
+          description: New tokens
+          content:
+            application/json:
+              example:
+                access_token: "eyJhbGciOiJIUzI1NiJ9.new.token"
+                refresh_token: "rt_newtoken1234567890"
+                expires_in: 900
+        "401":
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              example: { error: "invalid_refresh_token", message: "Refresh token is invalid or expired" }
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout (invalidate refresh token, clear FCM token)
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fcm_token: { type: string, example: "fcm_token_abc123" }
+      responses:
+        "204":
+          description: Logged out
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current authenticated user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              example:
+                id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                email: "user@example.com"
+                display_name: "Дмитро Дем'янов"
+                avatar_url: "https://storage.googleapis.com/geo-alert/avatars/a1b2.jpg"
+                bio: "Люблю путешествовать"
+                is_private: false
+                created_at: "2026-05-01T10:00:00Z"
+
+  # ── CARDS ─────────────────────────────────────────────────────────────────
+
+  /cards:
+    post:
+      tags: [Cards]
+      summary: Create card
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, privacy, radius, timezone]
+              properties:
+                title:              { type: string, example: "Моя карта Киева" }
+                description:        { type: string, example: "Любимые места" }
+                privacy:            { type: string, enum: [PRIVATE, LINK_ONLY, PUBLIC], example: PUBLIC }
+                allow_contributors: { type: boolean, example: true }
+                radius:             { type: integer, example: 200 }
+                timezone:           { type: string, example: "Europe/Kyiv" }
+      responses:
+        "201":
+          description: Card created
+          content:
+            application/json:
+              example:
+                id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                owner_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                title: "Моя карта Киева"
+                description: "Любимые места"
+                privacy: PUBLIC
+                allow_contributors: true
+                radius: 200
+                timezone: "Europe/Kyiv"
+                marker_count: 0
+                subscriber_count: 0
+                created_at: "2026-05-05T00:00:00Z"
+                updated_at: "2026-05-05T00:00:00Z"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              example: { error: "rate_limit_exceeded", message: "Too many requests" }
+
+  /cards/{id}:
+    get:
+      tags: [Cards]
+      summary: Get card details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Card details
+          content:
+            application/json:
+              example:
+                id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                owner_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                title: "Интересные места Киева"
+                description: "Мои любимые места"
+                privacy: PUBLIC
+                allow_contributors: true
+                radius: 200
+                timezone: "Europe/Kyiv"
+                marker_count: 12
+                subscriber_count: 34
+                created_at: "2026-05-01T10:00:00Z"
+                updated_at: "2026-05-04T12:30:00Z"
+        "403":
+          description: Private card
+          content:
+            application/json:
+              example: { error: "forbidden", message: "This card is private" }
+        "404":
+          description: Not found
+          content:
+            application/json:
+              example: { error: "not_found", message: "Card not found" }
+
+    put:
+      tags: [Cards]
+      summary: Update card
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:              { type: string }
+                description:        { type: string }
+                privacy:            { type: string, enum: [PRIVATE, LINK_ONLY, PUBLIC] }
+                allow_contributors: { type: boolean }
+                radius:             { type: integer }
+      responses:
+        "200":
+          description: Updated card
+          content:
+            application/json:
+              example:
+                id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                title: "Обновлённое название"
+                privacy: LINK_ONLY
+                radius: 300
+                updated_at: "2026-05-05T01:00:00Z"
+
+    delete:
+      tags: [Cards]
+      summary: Delete card (cascade delete markers)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204":
+          description: Deleted
+
+  /cards/{id}/markers:
+    get:
+      tags: [Cards]
+      summary: List markers on a card
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+        - in: query
+          name: offset
+          schema: { type: integer, default: 0 }
+        - in: query
+          name: sort
+          schema: { type: string, enum: [created_at, like_weight, expires_at], default: created_at }
+        - in: query
+          name: q
+          schema: { type: string, description: "Full-text search" }
+      responses:
+        "200":
+          description: List of markers
+          content:
+            application/json:
+              example:
+                data:
+                  - id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                    card_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                    created_by: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                    title: "Золоті ворота"
+                    description: "Пам'ятка архітектури XI ст."
+                    latitude: 50.4501
+                    longitude: 30.5234
+                    images: ["https://storage.googleapis.com/geo-alert/markers/img1.jpg"]
+                    tags: ["история", "архитектура"]
+                    like_weight: 7
+                    comment_count: 3
+                    allow_comments: true
+                    allow_likes: true
+                    is_draft: false
+                    notification_type: ON_ENTER
+                    expires_at: "2026-06-01T00:00:00Z"
+                    expiration_type: UNTIL_TIME
+                    created_at: "2026-05-02T08:00:00Z"
+                pagination:
+                  total: 12
+                  limit: 20
+                  offset: 0
+
+    post:
+      tags: [Markers]
+      summary: Create marker on a card
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, latitude, longitude]
+              properties:
+                title:            { type: string, maxLength: 200, example: "Золоті ворота" }
+                description:      { type: string, maxLength: 2000 }
+                latitude:         { type: number, example: 50.4501 }
+                longitude:        { type: number, example: 30.5234 }
+                images:           { type: array, items: { type: string }, maxItems: 5 }
+                tags:             { type: array, items: { type: string }, maxItems: 5 }
+                allow_comments:   { type: boolean, default: true }
+                allow_likes:      { type: boolean, default: true }
+                is_draft:         { type: boolean, default: false }
+                notification_type: { type: string, enum: [ON_ENTER, ON_APPROACH, BOTH] }
+                expiration_type:  { type: string, enum: [ETERNAL, UNTIL_TIME, PERIOD, END_OF_DAY] }
+                expires_at:       { type: string, format: date-time, nullable: true }
+      responses:
+        "201":
+          description: Marker created
+          content:
+            application/json:
+              example:
+                id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                card_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                created_by: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                title: "Золоті ворота"
+                latitude: 50.4501
+                longitude: 30.5234
+                like_weight: 0
+                comment_count: 0
+                view_count: 0
+                is_draft: false
+                notification_type: ON_ENTER
+                expiration_type: UNTIL_TIME
+                expires_at: "2026-06-01T00:00:00Z"
+                created_at: "2026-05-05T00:00:00Z"
+        "403":
+          description: Not a contributor or card is private
+        "429":
+          description: Rate limit — max 20 markers/hour
+          headers:
+            Retry-After: { schema: { type: integer }, example: 3600 }
+
+  # ── MARKERS ───────────────────────────────────────────────────────────────
+
+  /markers/{id}:
+    get:
+      tags: [Markers]
+      summary: Get marker details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Marker details
+          content:
+            application/json:
+              example:
+                id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                card_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                created_by: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                title: "Золоті ворота"
+                description: "Пам'ятка архітектури XI ст."
+                latitude: 50.4501
+                longitude: 30.5234
+                images: ["https://storage.googleapis.com/geo-alert/markers/img1.jpg"]
+                tags: ["история", "архитектура"]
+                like_weight: 7
+                comment_count: 3
+                view_count: 42
+                allow_comments: true
+                allow_likes: true
+                is_draft: false
+                notification_type: ON_ENTER
+                expires_at: "2026-06-01T00:00:00Z"
+                expiration_type: UNTIL_TIME
+                created_at: "2026-05-02T08:00:00Z"
+                updated_at: "2026-05-04T14:00:00Z"
+        "404":
+          description: Not found
+
+    put:
+      tags: [Markers]
+      summary: Update marker (or extend TTL)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:            { type: string }
+                description:      { type: string }
+                images:           { type: array, items: { type: string }, maxItems: 5 }
+                tags:             { type: array, items: { type: string }, maxItems: 5 }
+                allow_comments:   { type: boolean }
+                allow_likes:      { type: boolean }
+                is_draft:         { type: boolean }
+                notification_type: { type: string, enum: [ON_ENTER, ON_APPROACH, BOTH] }
+                expires_at:       { type: string, format: date-time, nullable: true, description: "Extend TTL" }
+                expiration_type:  { type: string, enum: [ETERNAL, UNTIL_TIME, PERIOD, END_OF_DAY] }
+      responses:
+        "200":
+          description: Updated marker
+          content:
+            application/json:
+              example:
+                id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                title: "Золоті ворота (оновлено)"
+                expires_at: "2026-07-01T00:00:00Z"
+                updated_at: "2026-05-05T01:00:00Z"
+        "403":
+          description: Not the owner of this marker
+        "404":
+          description: Marker not found
+
+    delete:
+      tags: [Markers]
+      summary: Delete marker (notifies users in radius)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204":
+          description: Deleted (WebSocket event sent to users in radius)
+
+  /markers/{id}/likes:
+    post:
+      tags: [Markers]
+      summary: Like / Dislike / Remove reaction (atomic)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [LIKE, DISLIKE, REMOVE]
+                  example: LIKE
+      responses:
+        "200":
+          description: Reaction updated
+          content:
+            application/json:
+              example:
+                marker_id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                action: LIKE
+                like_weight: 8
+        "403":
+          description: Likes disabled on this marker
+        "429":
+          description: Rate limit — max 100 likes/hour
+          headers:
+            Retry-After: { schema: { type: integer } }
+
+  /markers/{id}/comments:
+    get:
+      tags: [Markers]
+      summary: List comments
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+        - in: query
+          name: offset
+          schema: { type: integer, default: 0 }
+      responses:
+        "200":
+          description: Comments list
+          content:
+            application/json:
+              example:
+                data:
+                  - id: "d4e5f6a7-b8c9-0123-defa-234567890123"
+                    marker_id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                    user_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                    user:
+                      id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                      display_name: "Дмитро"
+                      avatar_url: "https://storage.googleapis.com/geo-alert/avatars/a1b2.jpg"
+                    text: "Відмінне місце!"
+                    mentions: []
+                    created_at: "2026-05-03T09:15:00Z"
+                pagination:
+                  total: 3
+                  limit: 20
+                  offset: 0
+
+    post:
+      tags: [Markers]
+      summary: Add comment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:     { type: string, maxLength: 500, example: "Відмінне місце!" }
+                mentions: { type: array, items: { type: string, format: uuid } }
+      responses:
+        "201":
+          description: Comment created
+          content:
+            application/json:
+              example:
+                id: "d4e5f6a7-b8c9-0123-defa-234567890123"
+                marker_id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                user_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                text: "Відмінне місце!"
+                mentions: []
+                created_at: "2026-05-05T00:10:00Z"
+        "403":
+          description: Comments disabled on this marker
+        "429":
+          description: Rate limit — max 50 comments/hour
+
+  /comments/{id}:
+    delete:
+      tags: [Markers]
+      summary: Delete comment (own comment or card owner)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204":
+          description: Deleted
+
+  /markers/{id}/reports:
+    post:
+      tags: [Markers]
+      summary: Report marker (notifies card owner)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, maxLength: 500, example: "Неприйнятний контент" }
+      responses:
+        "201":
+          description: Report created
+          content:
+            application/json:
+              example:
+                id: "e5f6a7b8-c9d0-1234-efab-345678901234"
+                marker_id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                reporter_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                reason: "Неприйнятний контент"
+                created_at: "2026-05-05T00:20:00Z"
+
+  /markers/{id}/views:
+    post:
+      tags: [Markers]
+      summary: Record view (only visible to marker creator)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204":
+          description: View recorded
+
+  # ── USERS ─────────────────────────────────────────────────────────────────
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Get user profile
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              example:
+                id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                display_name: "Дмитро Дем'янов"
+                avatar_url: "https://storage.googleapis.com/geo-alert/avatars/a1b2.jpg"
+                bio: "Люблю путешествовать"
+                is_private: false
+                created_at: "2026-05-01T10:00:00Z"
+        "403":
+          description: Private profile (blocked)
+        "404":
+          description: Not found
+
+  /users/me:
+    put:
+      tags: [Users]
+      summary: Update own profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name: { type: string }
+                bio:          { type: string, maxLength: 150 }
+                avatar_url:   { type: string, nullable: true }
+                is_private:   { type: boolean }
+                fcm_token:    { type: string, description: "FCM push token" }
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              example:
+                id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                display_name: "Дмитро"
+                bio: "Обновлённое bio"
+                is_private: false
+                updated_at: "2026-05-05T01:00:00Z"
+
+    delete:
+      tags: [Users]
+      summary: Delete account (cascade, clear FCM)
+      responses:
+        "204":
+          description: Account deleted
+
+  /users/{id}/cards:
+    get:
+      tags: [Users]
+      summary: Get user's public cards
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+        - in: query
+          name: offset
+          schema: { type: integer, default: 0 }
+      responses:
+        "200":
+          description: Public cards
+          content:
+            application/json:
+              example:
+                data:
+                  - id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                    title: "Интересные места Киева"
+                    privacy: PUBLIC
+                    marker_count: 12
+                    subscriber_count: 34
+                pagination:
+                  total: 3
+                  limit: 20
+                  offset: 0
+
+  # ── SUBSCRIPTIONS ─────────────────────────────────────────────────────────
+
+  /subscriptions:
+    post:
+      tags: [Subscriptions]
+      summary: Subscribe to card or user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                target_card_id: { type: string, format: uuid, nullable: true }
+                target_user_id: { type: string, format: uuid, nullable: true }
+      responses:
+        "201":
+          description: Subscribed
+          content:
+            application/json:
+              example:
+                id: "f6a7b8c9-d0e1-2345-fabc-456789012345"
+                user_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                target_card_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                target_user_id: null
+                created_at: "2026-05-05T00:00:00Z"
+
+  /subscriptions/{id}:
+    delete:
+      tags: [Subscriptions]
+      summary: Unsubscribe
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204":
+          description: Unsubscribed
+
+  /me/subscriptions:
+    get:
+      tags: [Subscriptions]
+      summary: My subscriptions
+      responses:
+        "200":
+          description: List of subscriptions
+          content:
+            application/json:
+              example:
+                data:
+                  - id: "f6a7b8c9-d0e1-2345-fabc-456789012345"
+                    target_card_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                    target_user_id: null
+                    card:
+                      id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                      title: "Интересные места Киева"
+                      marker_count: 12
+                    created_at: "2026-05-05T00:00:00Z"
+
+  # ── BLOCKS ────────────────────────────────────────────────────────────────
+
+  /users/{id}/block:
+    post:
+      tags: [Users]
+      summary: Block user (saves fingerprint)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fingerprints: { type: array, items: { type: string }, example: ["abc123def456"] }
+      responses:
+        "201":
+          description: Blocked
+          content:
+            application/json:
+              example:
+                id: "g7a8b9c0-d1e2-3456-gabc-567890123456"
+                blocker_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                blocked_user_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                block_type: USER_BLOCK
+                created_at: "2026-05-05T00:00:00Z"
+        "400":
+          description: Cannot block yourself
+
+    delete:
+      tags: [Users]
+      summary: Unblock user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204":
+          description: Unblocked
+
+  /cards/{id}/block:
+    post:
+      tags: [Cards]
+      summary: Block card (hide from user)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "201":
+          description: Card blocked
+
+  /me/blocked:
+    get:
+      tags: [Users]
+      summary: List blocked users and cards
+      responses:
+        "200":
+          description: Blocked list
+          content:
+            application/json:
+              example:
+                data:
+                  - id: "g7a8b9c0-d1e2-3456-gabc-567890123456"
+                    blocked_user_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                    block_type: USER_BLOCK
+                    user:
+                      display_name: "Заблокований Юзер"
+                      avatar_url: null
+                    created_at: "2026-05-05T00:00:00Z"
+
+  # ── FEED & NEARBY ─────────────────────────────────────────────────────────
+
+  /feed:
+    get:
+      tags: [Feed]
+      summary: Activity feed (paginated, sorted by last activity)
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+        - in: query
+          name: offset
+          schema: { type: integer, default: 0 }
+      responses:
+        "200":
+          description: Activity feed
+          content:
+            application/json:
+              example:
+                data:
+                  - type: NEW_MARKER
+                    card:
+                      id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                      title: "Интересные места Киева"
+                    marker:
+                      id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                      title: "Золоті ворота"
+                    actor:
+                      id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                      display_name: "Дмитро"
+                    occurred_at: "2026-05-05T00:00:00Z"
+                pagination:
+                  total: 50
+                  limit: 20
+                  offset: 0
+
+  /feed/nearby:
+    get:
+      tags: [Feed]
+      summary: Nearby markers by lat/lon
+      parameters:
+        - in: query
+          name: lat
+          required: true
+          schema: { type: number, example: 50.4501 }
+        - in: query
+          name: lon
+          required: true
+          schema: { type: number, example: 30.5234 }
+        - in: query
+          name: radius
+          schema: { type: integer, default: 1000, description: "Search radius in meters" }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 50 }
+      responses:
+        "200":
+          description: Nearby markers
+          content:
+            application/json:
+              example:
+                data:
+                  - id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                    title: "Золоті ворота"
+                    latitude: 50.4501
+                    longitude: 30.5234
+                    like_weight: 7
+                    distance_meters: 45
+                    expires_at: "2026-06-01T00:00:00Z"
+
+  # ── SEARCH ────────────────────────────────────────────────────────────────
+
+  /search:
+    get:
+      tags: [Search]
+      summary: Search markers, cards, or users
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: { type: string, example: "золоті ворота" }
+        - in: query
+          name: type
+          required: true
+          schema: { type: string, enum: [markers, cards, users] }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+        - in: query
+          name: offset
+          schema: { type: integer, default: 0 }
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              example:
+                type: markers
+                data:
+                  - id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                    title: "Золоті ворота"
+                    latitude: 50.4501
+                    longitude: 30.5234
+                    like_weight: 7
+                pagination:
+                  total: 5
+                  limit: 20
+                  offset: 0
+
+  # ── NOTIFICATIONS ─────────────────────────────────────────────────────────
+
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: Get my notifications
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+        - in: query
+          name: offset
+          schema: { type: integer, default: 0 }
+        - in: query
+          name: unread_only
+          schema: { type: boolean, default: false }
+      responses:
+        "200":
+          description: Notifications list
+          content:
+            application/json:
+              example:
+                data:
+                  - id: "e5f6a7b8-c9d0-1234-efab-345678901234"
+                    type: NEW_LIKE
+                    message: "Хтось лайкнув вашу мітку «Золоті ворота»"
+                    related_marker_id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                    related_card_id: null
+                    related_user_id: null
+                    is_read: false
+                    created_at: "2026-05-04T10:00:00Z"
+                  - id: "f6a7b8c9-d0e1-2345-fabc-456789012345"
+                    type: GEO_ENTER
+                    message: "Ви поряд з міткою «Золоті ворота»"
+                    related_marker_id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                    is_read: true
+                    created_at: "2026-05-04T09:00:00Z"
+                pagination:
+                  total: 15
+                  limit: 20
+                  offset: 0
+                unread_count: 5
+
+    delete:
+      tags: [Notifications]
+      summary: Clear all notifications
+      responses:
+        "204":
+          description: All notifications cleared
+
+  /notifications/{id}/read:
+    put:
+      tags: [Notifications]
+      summary: Mark notification as read
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Marked as read
+          content:
+            application/json:
+              example:
+                id: "e5f6a7b8-c9d0-1234-efab-345678901234"
+                is_read: true
+
+# ── WEBSOCKET ──────────────────────────────────────────────────────────────
+#
+# WS /ws  (Authorization: Bearer <token> via query param ?token=<jwt>)
+#
+# Клиент подключается и получает real-time события:
+
+x-websocket-messages:
+  connect:
+    description: Подключение к WebSocket
+    client_message:
+      type: object
+      example:
+        type: SUBSCRIBE_LOCATION
+        payload:
+          latitude: 50.4501
+          longitude: 30.5234
+          accuracy: 15
+
+  geo_alert:
+    description: |
+      Пользователь вошёл в радиус метки (или нескольких сразу).
+      Несколько меток объединяются в одно событие.
+    server_message:
+      example:
+        type: GEO_ALERT
+        payload:
+          markers:
+            - id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+              title: "Золоті ворота"
+              card_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+              distance_meters: 45
+            - id: "d4e5f6a7-b8c9-0123-defa-234567890123"
+              title: "Майдан Незалежності"
+              card_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+              distance_meters: 120
+          message: "Ви поряд з мітками: Золоті ворота, Майдан Незалежності"
+
+  marker_updated:
+    description: Метка обновлена (лайк, комментарий) — для всех в радиусе
+    server_message:
+      example:
+        type: MARKER_UPDATED
+        payload:
+          marker_id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+          update_type: LIKE
+          like_weight: 8
+
+  marker_deleted:
+    description: Метка удалена — уведомление для юзеров в радиусе
+    server_message:
+      example:
+        type: MARKER_DELETED
+        payload:
+          marker_id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+          title: "Золоті ворота"
+          message: "Мітку «Золоті ворота» було видалено"
+
+  new_comment:
+    description: Новый комментарий на метке — real-time обновление
+    server_message:
+      example:
+        type: NEW_COMMENT
+        payload:
+          marker_id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+          comment:
+            id: "d4e5f6a7-b8c9-0123-defa-234567890123"
+            user:
+              id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+              display_name: "Дмитро"
+            text: "Відмінне місце!"
+            created_at: "2026-05-05T00:10:00Z"
+
+  location_update:
+    description: Клиент отправляет обновление геолокации
+    client_message:
+      example:
+        type: LOCATION_UPDATE
+        payload:
+          latitude: 50.4512
+          longitude: 30.5241
+          accuracy: 12
+
+  ping:
+    description: Keepalive
+    client_message:
+      example: { type: PING }
+    server_message:
+      example: { type: PONG }
