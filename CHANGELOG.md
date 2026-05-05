@@ -314,3 +314,43 @@ tasks/BOARD.json                        (TASK-2.3 → merged)
 ```
 
 **Ветка:** `feature/TASK-2.3` → merged into `main`
+
+---
+
+### [TASK-2.4] Комментарии
+
+**Микрозадачи:**
+- [x] **2.4.1** `GET /markers/:id/comments` — список, новые сверху, cursor-пагинация
+- [x] **2.4.2** `POST /markers/:id/comments` — проверка `allow_comments`, парсинг `@UUID` mentions, INCREMENT comment_count
+- [x] **2.4.3** `DELETE /comments/:id` — мягкое удаление, автор или owner карты, DECREMENT comment_count
+
+**Файлы:**
+```
+backend/internal/domain/comment.go          (новый)
+backend/internal/repository/comment.go     (новый — FindByMarkerID, Create, FindByID, Delete, ExtractMentions)
+backend/internal/handler/comment.go        (новый — GET/POST /markers/:id/comments, DELETE /comments/:id)
+backend/cmd/server/main.go                 (обновлён: commentRepo, commentHandler, роуты)
+tasks/BOARD.json                           (TASK-2.4 → merged)
+```
+
+**Ветка:** `feature/TASK-2.4` → merged into `main`
+
+---
+
+### [TASK-5.5] Создание/редактирование метки UI
+
+**Микрозадачи:**
+- [x] **5.5.1** Клик на Leaflet карту → форма создания с координатами (только для owner карты)
+- [x] **5.5.2** Поля формы: title, description, tags (max 5), TTL picker (Вечная/До времени/До конца дня), фото (превью через createObjectURL), настройки (allow_comments/likes/is_draft/notification_type)
+- [x] **5.5.3** Диалог «В радиусе 200м уже есть метка» — Посмотреть / Лайкнуть (TODO) / Комментировать (TODO) / Создать свою
+- [x] **5.5.4** TTL countdown на карточке: useTtlCountdown хук, TtlBadge (animate-pulse при <10 мин, «Истекла» при истечении)
+
+**Файлы:**
+```
+frontend/src/api/markers.ts                   (новый — markersApi CRUD, типы MarkerData/CreateMarkerPayload)
+frontend/src/components/CreateMarkerModal.tsx (новый — полная форма с NearbyMarkersDialog)
+frontend/src/pages/CardPage.tsx               (обновлён — MapClickHandler, CreateMarkerModal, MarkerCard, TtlBadge)
+tasks/BOARD.json                              (TASK-5.5 → merged)
+```
+
+**Ветка:** `feature/TASK-5.5` → merged into `main`
