@@ -45,6 +45,7 @@ func main() {
 	likeRepo := repository.NewLikeRepo(db)
 	blockRepo := repository.NewBlockRepo(db)
 	feedRepo := repository.NewFeedRepo(db)
+	searchRepo := repository.NewSearchRepo(db)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
 	cardHandler := handler.NewCardHandler(cardRepo)
@@ -56,6 +57,7 @@ func main() {
 	userHandler := handler.NewUserHandler(userRepo, cardRepo, tokenRepo)
 	blockHandler := handler.NewBlockHandler(blockRepo, cardRepo, subRepo)
 	feedHandler := handler.NewFeedHandler(feedRepo)
+	searchHandler := handler.NewSearchHandler(searchRepo)
 	authMW := middleware.AuthRequired(jwtSvc)
 	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
@@ -122,6 +124,7 @@ func main() {
 	}
 	r.GET("/me/subscriptions", authMW, subHandler.ListMySubscriptions)
 	r.GET("/feed", authMW, feedHandler.GetFeed)
+	r.GET("/search", searchHandler.Search)
 	r.GET("/me/blocked", authMW, blockHandler.ListBlocked)
 
 	users := r.Group("/users")
