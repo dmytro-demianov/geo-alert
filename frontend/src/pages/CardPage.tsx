@@ -6,6 +6,7 @@ import { cardsApi, type Card } from '@/api/cards'
 import { markersApi, type MarkerData, type ExpirationType } from '@/api/markers'
 import { useAuthStore } from '@/store/auth'
 import CreateMarkerModal from '@/components/CreateMarkerModal'
+import MarkerDetailDrawer from '@/components/MarkerDetailDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -122,6 +123,7 @@ export default function CardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<MarkerData | null>(null)
+  const [drawerMarker, setDrawerMarker] = useState<MarkerData | null>(null)
   const [pendingLocation, setPendingLocation] = useState<PendingLocation | null>(null)
   const isOwner = card !== null && user !== null && card.owner_id === user.id
   // Keep a stable ref to avoid re-renders in MapClickHandler
@@ -230,7 +232,10 @@ export default function CardPage() {
                   key={m.id}
                   marker={m}
                   isSelected={selected?.id === m.id}
-                  onClick={() => setSelected(m)}
+                  onClick={() => {
+                    setSelected(m)
+                    setDrawerMarker(m)
+                  }}
                 />
               ))
             )}
@@ -246,7 +251,16 @@ export default function CardPage() {
             />
             <MapClickHandler onMapClick={handleMapClick} />
             {markers.map((m) => (
-              <Marker key={m.id} position={[m.latitude, m.longitude]}>
+              <Marker
+                key={m.id}
+                position={[m.latitude, m.longitude]}
+                eventHandlers={{
+                  click: () => {
+                    setSelected(m)
+                    setDrawerMarker(m)
+                  },
+                }}
+              >
                 <Popup>
                   <strong>{m.title}</strong>
                   {m.description && <p className="text-xs mt-1">{m.description}</p>}
@@ -267,6 +281,13 @@ export default function CardPage() {
           onCreated={handleMarkerCreated}
         />
       )}
+
+      {/* Marker detail drawer */}
+      <MarkerDetailDrawer
+        marker={drawerMarker}
+        isOwner={isOwner}
+        onClose={() => setDrawerMarker(null)}
+      />
     </>
   )
 }

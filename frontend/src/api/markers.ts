@@ -60,6 +60,9 @@ export const markersApi = {
   getById: (markerId: string) =>
     apiClient.get<MarkerData>(`/markers/${markerId}`),
 
+  getMarker: (markerId: string) =>
+    apiClient.get<MarkerData>(`/markers/${markerId}`),
+
   update: (markerId: string, payload: Partial<CreateMarkerPayload>) =>
     apiClient.put<MarkerData>(`/markers/${markerId}`, payload),
 
