@@ -38,8 +38,10 @@ func main() {
 
 	userRepo := repository.NewUserRepo(db)
 	tokenRepo := repository.NewRefreshTokenRepo(db)
+	cardRepo := repository.NewCardRepo(db)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
+	cardHandler := handler.NewCardHandler(cardRepo)
 	authMW := middleware.AuthRequired(jwtSvc)
 
 	if cfg.Server.Env == "production" {
@@ -64,6 +66,16 @@ func main() {
 		authGroup.POST("/logout", authHandler.Logout)
 		authGroup.GET("/me", authMW, authHandler.Me)
 	}
+
+	cards := r.Group("/cards")
+	{
+		cards.GET("", cardHandler.ListPublic)
+		cards.GET("/:id", cardHandler.GetCard)
+		cards.POST("", authMW, cardHandler.CreateCard)
+		cards.PUT("/:id", authMW, cardHandler.UpdateCard)
+		cards.DELETE("/:id", authMW, cardHandler.DeleteCard)
+	}
+	r.GET("/users/:id/cards", cardHandler.ListByOwner)
 
 	addr := ":" + cfg.Server.Port
 	log.Info().Str("addr", addr).Str("env", cfg.Server.Env).Msg("server starting")
