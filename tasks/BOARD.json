@@ -256,22 +256,6 @@
       "progress_notes": null,
       "error": null
     },
-    "TASK-3.3": {
-      "title": "Профили",
-      "epic": "EPIC-3",
-      "agent": "backend",
-      "status": "todo",
-      "depends_on": [
-        "TASK-1.4"
-      ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
-      "error": null
-    },
     "TASK-3.4": {
       "title": "Лента активности",
       "epic": "EPIC-3",
@@ -307,22 +291,6 @@
       "progress_notes": null,
       "error": null
     },
-    "TASK-4.1": {
-      "title": "WebSocket Real-time",
-      "epic": "EPIC-4",
-      "agent": "backend",
-      "status": "todo",
-      "depends_on": [
-        "TASK-1.4"
-      ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
-      "error": null
-    },
     "TASK-4.2": {
       "title": "Геолокация API",
       "epic": "EPIC-4",
@@ -330,22 +298,6 @@
       "status": "todo",
       "depends_on": [
         "TASK-2.2"
-      ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
-      "error": null
-    },
-    "TASK-4.3": {
-      "title": "Push-уведомления (FCM)",
-      "epic": "EPIC-4",
-      "agent": "backend",
-      "status": "todo",
-      "depends_on": [
-        "TASK-1.4"
       ],
       "agent_instance": null,
       "started_at": null,
@@ -469,24 +421,6 @@
       "progress_notes": "done: api/markers.ts (CRUD), components/CreateMarkerModal.tsx (title/desc/tags/TTL picker/фото превью/настройки/nearby dialog), CardPage.tsx — useMapEvents клик→форма только для owner, useTtlCountdown хук, TtlBadge (animate-pulse при <10мин), MarkerCard sub-component с тегами и статусом черновика",
       "error": null
     },
-    "TASK-5.6": {
-      "title": "Детали метки UI",
-      "epic": "EPIC-5",
-      "agent": "frontend",
-      "status": "todo",
-      "depends_on": [
-        "TASK-5.5",
-        "TASK-2.3",
-        "TASK-2.4"
-      ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
-      "error": null
-    },
     "TASK-5.7": {
       "title": "Социальные функции UI",
       "epic": "EPIC-5",
@@ -591,22 +525,6 @@
       "progress_notes": null,
       "error": null
     },
-    "TASK-6.2": {
-      "title": "Тесты Frontend",
-      "epic": "EPIC-6",
-      "agent": "frontend",
-      "status": "todo",
-      "depends_on": [
-        "TASK-5.5"
-      ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
-      "error": null
-    },
     "TASK-6.3": {
       "title": "PostgreSQL оптимизация",
       "epic": "EPIC-6",
@@ -651,6 +569,242 @@
         "TASK-6.2",
         "TASK-6.3",
         "TASK-6.4"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-4.1-A": {
+      "title": "WebSocket: Connection Manager",
+      "epic": "EPIC-4",
+      "agent": "backend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-1.4"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-4.1-B": {
+      "title": "WebSocket: Broadcast лайків та коментарів",
+      "epic": "EPIC-4",
+      "agent": "backend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-4.1-A"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-4.1-C": {
+      "title": "WebSocket: Heartbeat + ping-pong",
+      "epic": "EPIC-4",
+      "agent": "backend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-4.1-A"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-4.3-A": {
+      "title": "FCM: Firebase Admin SDK + збереження токена",
+      "epic": "EPIC-4",
+      "agent": "backend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-1.4"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-4.3-B": {
+      "title": "FCM: Відправка push + batching + cooldown",
+      "epic": "EPIC-4",
+      "agent": "backend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-4.3-A"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-4.3-C": {
+      "title": "FCM: Cleanup невалідних токенів + logout",
+      "epic": "EPIC-4",
+      "agent": "backend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-4.3-A"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-3.3-A": {
+      "title": "Профілі: GET /users/:id",
+      "epic": "EPIC-3",
+      "agent": "backend",
+      "status": "todo",
+      "depends_on": [],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-3.3-B": {
+      "title": "Профілі: PUT /users/me (редагування)",
+      "epic": "EPIC-3",
+      "agent": "backend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-3.3-A"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-3.3-C": {
+      "title": "Профілі: DELETE /users/me (soft delete + cascade)",
+      "epic": "EPIC-3",
+      "agent": "backend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-3.3-A"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-5.6-A": {
+      "title": "Деталі метки: галерея фото + теги + view_count",
+      "epic": "EPIC-5",
+      "agent": "frontend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-5.11"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-5.6-B": {
+      "title": "Деталі метки: лайк/дизлайк + real-time лічильник",
+      "epic": "EPIC-5",
+      "agent": "frontend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-5.6-A"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-5.6-C": {
+      "title": "Деталі метки: коментарі + @mention autocomplete",
+      "epic": "EPIC-5",
+      "agent": "frontend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-5.6-A"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-5.6-D": {
+      "title": "Деталі метки: кнопка 'Поскаржитись'",
+      "epic": "EPIC-5",
+      "agent": "frontend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-5.6-A"
+      ],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-6.2-A": {
+      "title": "Тести: Unit (Vitest + Testing Library) — форма, TTL, кольори",
+      "epic": "EPIC-6",
+      "agent": "frontend",
+      "status": "todo",
+      "depends_on": [],
+      "agent_instance": null,
+      "started_at": null,
+      "done_at": null,
+      "merged_at": null,
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-6.2-B": {
+      "title": "Тести: E2E (Playwright) — створення картки/метки, підписка",
+      "epic": "EPIC-6",
+      "agent": "frontend",
+      "status": "todo",
+      "depends_on": [
+        "TASK-6.2-A"
       ],
       "agent_instance": null,
       "started_at": null,
