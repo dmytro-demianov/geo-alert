@@ -7,12 +7,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
+	"context"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/dmytro-demianov/geo-alert/internal/auth"
 	"github.com/dmytro-demianov/geo-alert/internal/config"
 	"github.com/dmytro-demianov/geo-alert/internal/handler"
 	"github.com/dmytro-demianov/geo-alert/internal/middleware"
 	"github.com/dmytro-demianov/geo-alert/internal/repository"
 	"github.com/dmytro-demianov/geo-alert/internal/service"
+	"github.com/dmytro-demianov/geo-alert/internal/worker"
 	"github.com/dmytro-demianov/geo-alert/internal/ws"
 	"github.com/dmytro-demianov/geo-alert/pkg/fcm"
 	"github.com/dmytro-demianov/geo-alert/pkg/logger"
@@ -92,6 +98,8 @@ func main() {
 
 	r := gin.New()
 	r.Use(gin.Recovery())
+	r.Use(middleware.SecurityHeaders())
+	r.Use(middleware.CORS(cfg.Server.CORSAllowedOrigins))
 	r.Use(requestLogger())
 	r.Use(middleware.RateLimit())
 
@@ -166,6 +174,15 @@ func main() {
 
 	cards.POST("/:id/block", authMW, blockHandler.BlockUserOnCard)
 	cards.DELETE("/:id/block", authMW, blockHandler.UnblockUserOnCard)
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	ttlWorker := worker.NewTTLWorker(markerRepo, storageClient, cfg.TTLWorkerInterval)
+	go ttlWorker.Run(ctx)
+
+	fcmCleanup := worker.NewFCMCleanupWorker(userRepo, fcmClient, cfg.FCMCleanupInterval)
+	go fcmCleanup.Run(ctx)
 
 	addr := ":" + cfg.Server.Port
 	log.Info().Str("addr", addr).Str("env", cfg.Server.Env).Msg("server starting")
