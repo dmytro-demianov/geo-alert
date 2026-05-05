@@ -296,16 +296,16 @@
       "title": "Геолокация API",
       "epic": "EPIC-4",
       "agent": "backend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": [
         "TASK-2.2"
       ],
       "agent_instance": "agent-backend-8",
       "started_at": "2026-05-05T00:00:00Z",
-      "done_at": null,
-      "merged_at": null,
-      "branch": "feature/TASK-4.2",
-      "progress_notes": null,
+      "done_at": "2026-05-05T00:00:00Z",
+      "merged_at": "2026-05-05T00:00:00Z",
+      "branch": "feature/TASK-4.2-TASK-4.3-B",
+      "progress_notes": "done: repository/location.go (FindNearbyForUser — PostGIS ST_DWithin з фільтрами підписок/блокувань, FindNearbyPublic — cursor pagination), handler/location.go (POST /users/me/location: low_accuracy flag, nearby_markers; GET /feed/nearby: radius/limit/cursor), роути в main.go",
       "error": null
     },
     "TASK-4.4": {
@@ -359,17 +359,17 @@
       "title": "Auth UI",
       "epic": "EPIC-5",
       "agent": "frontend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": [
         "TASK-5.1",
         "TASK-1.4"
       ],
       "agent_instance": "agent-frontend-3",
       "started_at": "2026-05-05T00:00:00Z",
-      "done_at": null,
-      "merged_at": null,
+      "done_at": "2026-05-05T00:00:00Z",
+      "merged_at": "2026-05-05T00:00:00Z",
       "branch": "feature/TASK-5.2",
-      "progress_notes": null,
+      "progress_notes": "done: LoginPage.tsx (Google OAuth кнопка, redirect), AuthCallbackPage.tsx (code exchange, JWT збереження), api/auth.ts (exchangeCodeForTokens/buildGoogleOAuthUrl/logoutRequest/fetchMe), ProtectedRoute, logout в TopBar, AuthInit у App.tsx",
       "error": null
     },
     "TASK-5.3": {
@@ -647,16 +647,16 @@
       "title": "FCM: Відправка push + batching + cooldown",
       "epic": "EPIC-4",
       "agent": "backend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": [
         "TASK-4.3-A"
       ],
       "agent_instance": "agent-backend-9",
       "started_at": "2026-05-05T00:00:00Z",
-      "done_at": null,
-      "merged_at": null,
-      "branch": "feature/TASK-4.3-B",
-      "progress_notes": null,
+      "done_at": "2026-05-05T00:00:00Z",
+      "merged_at": "2026-05-05T00:00:00Z",
+      "branch": "feature/TASK-4.2-TASK-4.3-B",
+      "progress_notes": "done: service/notification.go (NotificationService.SendNearbyPush: batching + cooldown + invalid token cleanup), repository/notification_cooldown.go (CooldownRepo Get/Upsert/MarkLeft), migrations/011_notification_cooldowns, LocationHandler інтегрований з NotificationService",
       "error": null
     },
     "TASK-4.3-C": {

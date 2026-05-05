@@ -685,3 +685,66 @@ frontend/src/components/TopBar.tsx             (навігація в UserButton
 ```
 
 **Ветка:** `feature/TASK-5.7` → merged into `main`
+
+---
+
+### [TASK-5.2] Auth UI
+
+**Мікрозадачі:**
+- [x] **5.2.1** `LoginPage.tsx` — сторінка `/login` з кнопкою "Увійти через Google" (SVG-іконка Google), редирект на OAuth URL, автоматичний redirect якщо вже авторизований
+- [x] **5.2.2** `AuthCallbackPage.tsx` — обробка OAuth callback: отримання `code` з query params → `POST /auth/google` → збереження JWT в Zustand-сторі → redirect на `/`; обробка помилок та `error` param; захист від React StrictMode double-invoke через `useRef`
+- [x] **5.2.3** Logout у `TopBar.tsx` → `POST /auth/logout` + очищення стору + redirect на `/login`
+- [x] `api/auth.ts` — `exchangeCodeForTokens`, `buildGoogleOAuthUrl`, `logoutRequest`, `fetchMe`
+- [x] `ProtectedRoute.tsx` — redirect неавторизованих на `/login`
+- [x] `AuthInit` у `App.tsx` — перевірка токена через `GET /auth/me` при старті
+
+**Файли:**
+```
+frontend/src/pages/LoginPage.tsx          (нова сторінка /login)
+frontend/src/pages/AuthCallbackPage.tsx   (OAuth callback /auth/callback)
+frontend/src/api/auth.ts                  (auth API functions)
+frontend/src/components/ProtectedRoute.tsx
+frontend/src/App.tsx                      (AuthInit + роути)
+frontend/src/components/TopBar.tsx        (logout)
+```
+
+**Гілка:** `feature/TASK-5.2` → merged into `main`
+
+---
+
+### [TASK-4.2] Геолокація API
+
+**Мікрозадачі:**
+- [x] **4.2.1** `POST /users/me/location` — приймає `{lat, lon, accuracy}`, PostGIS `ST_DWithin` з фільтрами підписок/блокувань, повертає `{low_accuracy, nearby_markers[]}` з `distance_meters`
+- [x] **4.2.2** `GET /feed/nearby?lat=&lon=&radius=` — публічні метки рядом, cursor pagination (limit/cursor), опціональна авторизація (виключає заблокованих)
+
+**Файли:**
+```
+backend/internal/repository/location.go  (LocationRepo: FindNearbyForUser, FindNearbyPublic)
+backend/internal/handler/location.go     (LocationHandler: UpdateLocation, GetNearbyFeed)
+backend/cmd/server/main.go               (роути + wiring)
+backend/internal/domain/card.go          (+Radius field)
+```
+
+**Гілка:** `feature/TASK-4.2-TASK-4.3-B` → merged into `main`
+
+---
+
+### [TASK-4.3-B] FCM: Push батчинг + cooldown
+
+**Мікрозадачі:**
+- [x] **4.3.3** Батчинг: перевірка cooldown для кожної метки → один FCM push "Вы рядом с: X, Y, Z"
+- [x] **4.3.4** Cooldown: `notification_cooldowns` таблиця per (user_id, marker_id); повторне уведомлення після виходу з радіусу або через 1 годину
+- [x] Cleanup невалідних токенів при отриманні `registration-token-not-registered` від FCM
+- [x] Міграція `011_notification_cooldowns` (up/down)
+
+**Файли:**
+```
+backend/internal/service/notification.go              (NotificationService.SendNearbyPush)
+backend/internal/repository/notification_cooldown.go  (CooldownRepo: Get/Upsert/MarkLeft)
+backend/migrations/011_notification_cooldowns.up.sql
+backend/migrations/011_notification_cooldowns.down.sql
+backend/cmd/server/main.go                             (cooldownRepo + notifService wiring)
+```
+
+**Гілка:** `feature/TASK-4.2-TASK-4.3-B` → merged into `main`
