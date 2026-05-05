@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
@@ -11,20 +12,23 @@ import (
 
 	"github.com/dmytro-demianov/geo-alert/internal/domain"
 	"github.com/dmytro-demianov/geo-alert/internal/repository"
+	"github.com/dmytro-demianov/geo-alert/internal/ws"
 )
 
 type CommentHandler struct {
 	comments *repository.CommentRepo
 	markers  *repository.MarkerRepo
 	cards    *repository.CardRepo
+	wsHub    *ws.Manager
 }
 
 func NewCommentHandler(
 	comments *repository.CommentRepo,
 	markers *repository.MarkerRepo,
 	cards *repository.CardRepo,
+	wsHub *ws.Manager,
 ) *CommentHandler {
-	return &CommentHandler{comments: comments, markers: markers, cards: cards}
+	return &CommentHandler{comments: comments, markers: markers, cards: cards, wsHub: wsHub}
 }
 
 func commentResponse(c *domain.Comment) gin.H {
@@ -132,6 +136,14 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 	}
 
 	// TODO: send notification to marker author and mentioned users (TASK-4.4)
+
+	if msg, err := json.Marshal(map[string]any{
+		"type":      "new_comment",
+		"marker_id": markerID,
+		"comment":   commentResponse(comment),
+	}); err == nil {
+		h.wsHub.Broadcast(msg)
+	}
 
 	c.JSON(http.StatusCreated, commentResponse(comment))
 }

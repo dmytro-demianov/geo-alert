@@ -49,18 +49,19 @@ func main() {
 	feedRepo := repository.NewFeedRepo(db)
 	searchRepo := repository.NewSearchRepo(db)
 
+	wsManager := ws.NewManager()
+
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
 	cardHandler := handler.NewCardHandler(cardRepo)
 	markerHandler := handler.NewMarkerHandler(markerRepo, cardRepo)
 	subHandler := handler.NewSubscriptionHandler(subRepo, cardRepo)
-	commentHandler := handler.NewCommentHandler(commentRepo, markerRepo, cardRepo)
-	likeHandler := handler.NewLikeHandler(likeRepo, markerRepo)
+	commentHandler := handler.NewCommentHandler(commentRepo, markerRepo, cardRepo, wsManager)
+	likeHandler := handler.NewLikeHandler(likeRepo, markerRepo, wsManager)
 	viewHandler := handler.NewViewHandler(markerRepo)
 	userHandler := handler.NewUserHandler(userRepo, cardRepo, tokenRepo)
 	blockHandler := handler.NewBlockHandler(blockRepo, cardRepo, subRepo)
 	feedHandler := handler.NewFeedHandler(feedRepo)
 	searchHandler := handler.NewSearchHandler(searchRepo)
-	wsManager := ws.NewManager()
 	wsHandler := handler.NewWSHandler(wsManager)
 
 	fcmClient, err := fcm.New(cfg.Firebase.ServiceAccountJSON)
