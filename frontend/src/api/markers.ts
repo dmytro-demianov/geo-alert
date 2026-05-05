@@ -2,6 +2,35 @@ import { apiClient } from './client'
 
 export type NotificationType = 'ON_ENTER' | 'ON_APPROACH' | 'BOTH'
 export type ExpirationType = 'ETERNAL' | 'UNTIL_TIME' | 'PERIOD' | 'END_OF_DAY'
+export type LikeType = 'LIKE' | 'DISLIKE'
+export type ReportReason =
+  | 'spam'
+  | 'inappropriate'
+  | 'misinformation'
+  | 'copyright'
+  | 'other'
+
+export interface Comment {
+  id: string
+  marker_id: string
+  created_by: string
+  author_name: string
+  author_avatar?: string
+  content: string
+  created_at: string
+  deleted_at?: string | null
+}
+
+export interface CommentsResponse {
+  comments: Comment[]
+  cursor?: string
+  has_more?: boolean
+}
+
+export interface LikeResponse {
+  type: LikeType | null
+  like_weight: number
+}
 
 export interface MarkerData {
   id: string
@@ -68,4 +97,21 @@ export const markersApi = {
 
   delete: (markerId: string) =>
     apiClient.delete(`/markers/${markerId}`),
+
+  toggleLike: (markerId: string, type: LikeType) =>
+    apiClient.post<LikeResponse>(`/markers/${markerId}/likes`, { type }),
+
+  getComments: (markerId: string, cursor?: string, limit = 20) =>
+    apiClient.get<CommentsResponse>(`/markers/${markerId}/comments`, {
+      params: { cursor, limit },
+    }),
+
+  createComment: (markerId: string, content: string) =>
+    apiClient.post<Comment>(`/markers/${markerId}/comments`, { content }),
+
+  deleteComment: (commentId: string) =>
+    apiClient.delete(`/comments/${commentId}`),
+
+  reportMarker: (markerId: string, reason: ReportReason, comment?: string) =>
+    apiClient.post(`/markers/${markerId}/reports`, { reason, comment }),
 }
