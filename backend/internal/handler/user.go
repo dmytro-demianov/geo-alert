@@ -20,6 +20,25 @@ func NewUserHandler(users *repository.UserRepo, cards *repository.CardRepo, toke
 	return &UserHandler{users: users, cards: cards, tokens: tokens}
 }
 
+// POST /users/me/fcm-token
+func (h *UserHandler) SaveFCMToken(c *gin.Context) {
+	var req struct {
+		Token string `json:"token" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID := c.MustGet("user_id").(uuid.UUID)
+	if err := h.users.UpdateFCMToken(userID, req.Token); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"ok": true})
+}
+
 // PUT /users/me
 func (h *UserHandler) UpdateMe(c *gin.Context) {
 	var req struct {

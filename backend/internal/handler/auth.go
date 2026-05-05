@@ -164,6 +164,10 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 		return
 	}
 	_ = h.tokens.DeleteByHash(hashToken(req.RefreshToken))
+	// Clear FCM token so the device stops receiving pushes after logout.
+	if userID, ok := c.Get("user_id"); ok {
+		_ = h.users.ClearFCMToken(userID.(uuid.UUID))
+	}
 	c.JSON(http.StatusOK, gin.H{"ok": true})
 }
 
