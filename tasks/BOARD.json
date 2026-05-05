@@ -312,16 +312,16 @@
       "title": "In-app уведомления",
       "epic": "EPIC-4",
       "agent": "backend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-4.3"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-backend-12",
+      "started_at": "2026-05-05T14:00:00Z",
+      "done_at": "2026-05-06T10:00:00Z",
+      "merged_at": "2026-05-06T10:00:00Z",
+      "branch": "feature/TASK-4.4",
+      "progress_notes": "done: domain/notification.go, repository/notification.go (Create/FindByUserID/CountUnread/MarkRead/MarkAllRead), handler/notification.go (GET /notifications, GET /notifications/unread-count, PUT /notifications/:id/read, PUT /notifications/read-all), WS broadcast new_notification з like/comment/mention handlers, notifRepo передано в likeHandler/commentHandler/subHandler",
       "error": null
     },
     "TASK-4.5": {
@@ -461,17 +461,17 @@
       "title": "Поиск UI",
       "epic": "EPIC-5",
       "agent": "frontend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-5.1",
         "TASK-3.5"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-frontend-7",
+      "started_at": "2026-05-05T14:00:00Z",
+      "done_at": "2026-05-06T10:00:00Z",
+      "merged_at": "2026-05-06T10:00:00Z",
+      "branch": "feature/TASK-5.9",
+      "progress_notes": "done: api/search.ts (searchMarkers/searchCards/searchUsers), SearchPage /search (tabs Метки/Картки/Люди, debounced query, tags filter для markers, pagination offset, skeleton+error+empty states), SearchBar в TopBar навігує на /search, роут /search в App.tsx",
       "error": null
     },
     "TASK-5.10": {

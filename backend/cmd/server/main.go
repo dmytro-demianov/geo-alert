@@ -58,6 +58,7 @@ func main() {
 	searchRepo := repository.NewSearchRepo(db)
 	locationRepo := repository.NewLocationRepo(db)
 	cooldownRepo := repository.NewCooldownRepo(db)
+	notifRepo := repository.NewNotificationRepo(db)
 
 	wsManager := ws.NewManager()
 
@@ -79,9 +80,10 @@ func main() {
 	cardHandler := handler.NewCardHandler(cardRepo)
 	markerHandler := handler.NewMarkerHandler(markerRepo, cardRepo, storageClient)
 	uploadHandler := handler.NewUploadHandler(storageClient)
-	subHandler := handler.NewSubscriptionHandler(subRepo, cardRepo)
-	commentHandler := handler.NewCommentHandler(commentRepo, markerRepo, cardRepo, wsManager)
-	likeHandler := handler.NewLikeHandler(likeRepo, markerRepo, wsManager)
+	subHandler := handler.NewSubscriptionHandler(subRepo, cardRepo, wsManager, notifRepo)
+	commentHandler := handler.NewCommentHandler(commentRepo, markerRepo, cardRepo, wsManager, notifRepo)
+	likeHandler := handler.NewLikeHandler(likeRepo, markerRepo, wsManager, notifRepo)
+	notifHandler := handler.NewNotificationHandler(notifRepo)
 	viewHandler := handler.NewViewHandler(markerRepo)
 	userHandler := handler.NewUserHandler(userRepo, cardRepo, tokenRepo)
 	blockHandler := handler.NewBlockHandler(blockRepo, cardRepo, subRepo)
@@ -165,6 +167,14 @@ func main() {
 	r.GET("/search", searchHandler.Search)
 	r.POST("/upload/photo", authMW, uploadHandler.UploadPhoto)
 	r.GET("/me/blocked", authMW, blockHandler.ListBlocked)
+
+	notifs := r.Group("/notifications", authMW)
+	{
+		notifs.GET("", notifHandler.List)
+		notifs.GET("/unread-count", notifHandler.UnreadCount)
+		notifs.PUT("/:id/read", notifHandler.MarkRead)
+		notifs.PUT("/read-all", notifHandler.MarkAllRead)
+	}
 
 	users := r.Group("/users")
 	{

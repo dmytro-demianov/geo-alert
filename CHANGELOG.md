@@ -946,3 +946,50 @@ frontend/src/api/markers.ts                     (ReportReason, reportMarker)
 ```
 
 **Гілка:** `feature/TASK-5.6-BCD` → merged into `main`
+
+---
+
+### [TASK-4.4] In-app уведомления (backend)
+
+**Мікрозадачі:**
+- [x] `domain/notification.go` — модель Notification з NotificationEventType (GEO_ENTER, NEW_LIKE, NEW_COMMENT, NEW_MENTION, NEW_SUBSCRIBER тощо)
+- [x] `repository/notification.go` — Create, FindByUserID (cursor pagination), CountUnread, MarkRead, MarkAllRead
+- [x] `handler/notification.go` — GET /notifications, GET /notifications/unread-count, PUT /notifications/:id/read, PUT /notifications/read-all
+- [x] Реєстрація роутів у main.go (`/notifications` group з authMW)
+- [x] `notifRepo` передано в likeHandler, commentHandler, subHandler
+- [x] WS broadcast `new_notification` при лайку, коментарі, mention
+
+**Файли:**
+```
+backend/internal/domain/notification.go
+backend/internal/repository/notification.go
+backend/internal/handler/notification.go
+backend/cmd/server/main.go              (notifRepo, роути /notifications)
+backend/internal/handler/subscription.go (unused import прибрано)
+```
+
+**Гілка:** `feature/TASK-4.4` → merged into `main`
+
+---
+
+### [TASK-5.9] Поиск UI (frontend)
+
+**Мікрозадачі:**
+- [x] `api/search.ts` — SearchMarker, SearchCard, SearchUser інтерфейси; searchMarkers/searchCards/searchUsers через GET /search
+- [x] `SearchPage` (/search) — tabs Метки/Картки/Люди, debounced query (400ms), offset pagination
+- [x] TagsFilter для вкладки Метки — input Enter → pill badge з видаленням
+- [x] Skeleton loader (animate-pulse), error state з кнопкою повтору, empty state
+- [x] Результати: MarkerResultCard (heat color, теги, coords), CardResultCard, UserResultCard (Avatar, is_private)
+- [x] URL sync — ?q=...&type=... оновлюється через useSearchParams
+- [x] SearchBar у TopBar тепер навігує на /search замість inline dropdown
+- [x] Роут /search зареєстровано в App.tsx (ProtectedRoute)
+
+**Файли:**
+```
+frontend/src/api/search.ts
+frontend/src/pages/SearchPage.tsx
+frontend/src/components/TopBar.tsx      (SearchBar → navigate /search)
+frontend/src/App.tsx                    (роут /search + import SearchPage)
+```
+
+**Гілка:** `feature/TASK-5.9` → merged into `main`

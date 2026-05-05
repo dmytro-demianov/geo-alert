@@ -11,62 +11,22 @@ interface TopBarProps {
 }
 
 function SearchBar() {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
+  const handleClick = () => {
+    navigate('/search')
+  }
 
   return (
-    <div ref={ref} className="flex-1 relative max-w-[520px]">
+    <div className="flex-1 relative max-w-[520px]">
       <div
-        onClick={() => setOpen(true)}
+        onClick={handleClick}
         className="bg-slate-100 rounded-full px-3.5 py-2 flex items-center gap-2 cursor-pointer shadow-inset"
       >
         <Icon name="search" size={15} stroke="#94A3B8" />
         <span className="text-slate-400 text-[13px] flex-1">Пошук позначок, місць, тегів…</span>
         <kbd className="font-mono text-[11px] text-slate-400 bg-white px-1.5 py-0.5 rounded border border-slate-200">⌘K</kbd>
       </div>
-
-      {open && (
-        <div
-          className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white rounded-lg border border-slate-200 shadow-lg z-50 overflow-hidden"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="px-3.5 py-2.5 border-b border-slate-100 flex items-center gap-2.5">
-            <Icon name="search" size={15} stroke="#64748B" />
-            <input
-              autoFocus
-              placeholder="Введіть запит…"
-              className="flex-1 border-0 text-sm outline-none bg-transparent"
-            />
-            <button onClick={() => setOpen(false)} className="text-slate-400 flex">
-              <Icon name="x" size={15} />
-            </button>
-          </div>
-          <div className="py-2">
-            <div className="px-3.5 py-1 text-[10px] font-bold tracking-widest uppercase text-slate-400">Фільтри</div>
-            <div className="px-3.5 py-2 flex flex-wrap gap-1.5">
-              {['🔥 Гарячі', 'Поруч 500 м', 'Сьогодні', '📷 З фото', '#історія', '#кафе'].map((t) => (
-                <button key={t} className="px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
-                  {t}
-                </button>
-              ))}
-            </div>
-            <div className="px-3.5 py-1 text-[10px] font-bold tracking-widest uppercase text-slate-400">Останні</div>
-            {["Золоті ворота", "кав'ярні", 'парки'].map((q) => (
-              <button key={q} className="w-full text-left px-3.5 py-2 text-sm text-slate-900 hover:bg-slate-50 flex items-center gap-2.5 transition-colors">
-                <Icon name="clock" size={13} stroke="#94A3B8" />{q}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

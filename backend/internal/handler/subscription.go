@@ -9,15 +9,18 @@ import (
 
 	"github.com/dmytro-demianov/geo-alert/internal/domain"
 	"github.com/dmytro-demianov/geo-alert/internal/repository"
+	"github.com/dmytro-demianov/geo-alert/internal/ws"
 )
 
 type SubscriptionHandler struct {
-	subs  *repository.SubscriptionRepo
-	cards *repository.CardRepo
+	subs      *repository.SubscriptionRepo
+	cards     *repository.CardRepo
+	wsHub     *ws.Manager
+	notifRepo *repository.NotificationRepo
 }
 
-func NewSubscriptionHandler(subs *repository.SubscriptionRepo, cards *repository.CardRepo) *SubscriptionHandler {
-	return &SubscriptionHandler{subs: subs, cards: cards}
+func NewSubscriptionHandler(subs *repository.SubscriptionRepo, cards *repository.CardRepo, wsHub *ws.Manager, notifRepo *repository.NotificationRepo) *SubscriptionHandler {
+	return &SubscriptionHandler{subs: subs, cards: cards, wsHub: wsHub, notifRepo: notifRepo}
 }
 
 type createSubscriptionRequest struct {
