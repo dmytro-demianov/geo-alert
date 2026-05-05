@@ -166,3 +166,16 @@ func (r *MarkerRepo) DecrementMarkerCount(cardID uuid.UUID) error {
 	return r.db.Exec("UPDATE cards SET marker_count = GREATEST(marker_count - 1, 0) WHERE id = ?", cardID).Error
 }
 
+func (r *MarkerRepo) FindExpired(limit int) ([]domain.Marker, error) {
+	var markers []domain.Marker
+	err := r.db.Where("expires_at < NOW() AND deleted_at IS NULL").Limit(limit).Find(&markers).Error
+	return markers, err
+}
+
+func (r *MarkerRepo) SoftDeleteExpired(ids []uuid.UUID) (int64, error) {
+	result := r.db.Model(&domain.Marker{}).
+		Where("id IN ?", ids).
+		Update("deleted_at", gorm.Expr("NOW()"))
+	return result.RowsAffected, result.Error
+}
+
