@@ -102,6 +102,13 @@ func (d *DBConfig) DSN() string {
 	)
 }
 
+func (d *DBConfig) URL() string {
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		d.User, d.Password, d.Host, d.Port, d.Name,
+	)
+}
+
 func getEnv(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
