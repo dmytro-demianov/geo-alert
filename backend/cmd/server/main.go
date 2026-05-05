@@ -39,9 +39,11 @@ func main() {
 	userRepo := repository.NewUserRepo(db)
 	tokenRepo := repository.NewRefreshTokenRepo(db)
 	cardRepo := repository.NewCardRepo(db)
+	subRepo := repository.NewSubscriptionRepo(db)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
 	cardHandler := handler.NewCardHandler(cardRepo)
+	subHandler := handler.NewSubscriptionHandler(subRepo, cardRepo)
 	authMW := middleware.AuthRequired(jwtSvc)
 
 	if cfg.Server.Env == "production" {
@@ -76,6 +78,13 @@ func main() {
 		cards.DELETE("/:id", authMW, cardHandler.DeleteCard)
 	}
 	r.GET("/users/:id/cards", cardHandler.ListByOwner)
+
+	subs := r.Group("/subscriptions")
+	{
+		subs.POST("", authMW, subHandler.Subscribe)
+		subs.DELETE("/:id", authMW, subHandler.Unsubscribe)
+	}
+	r.GET("/me/subscriptions", authMW, subHandler.ListMySubscriptions)
 
 	addr := ":" + cfg.Server.Port
 	log.Info().Str("addr", addr).Str("env", cfg.Server.Env).Msg("server starting")
