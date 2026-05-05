@@ -9,6 +9,20 @@ import (
 	"github.com/dmytro-demianov/geo-alert/internal/auth"
 )
 
+// OptionalAuth sets user_id in context if a valid Bearer token is present, but doesn't block.
+func OptionalAuth(jwt *auth.JWTService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		header := c.GetHeader("Authorization")
+		if strings.HasPrefix(header, "Bearer ") {
+			tokenStr := strings.TrimPrefix(header, "Bearer ")
+			if claims, err := jwt.ValidateAccessToken(tokenStr); err == nil {
+				c.Set("user_id", claims.UserID)
+			}
+		}
+		c.Next()
+	}
+}
+
 func AuthRequired(jwt *auth.JWTService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
