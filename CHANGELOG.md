@@ -422,3 +422,21 @@ tasks/BOARD.json                     (TASK-2.5 → merged)
 ```
 
 **Гілка:** `feature/TASK-2.5` → merged into `main`
+
+---
+
+### [TASK-1.5] Rate Limiting Middleware
+
+**Мікрозадачі:**
+- [x] **1.5.1** Sliding-window rate limiter (in-memory, per IP + endpoint)
+- [x] **1.5.2** Ліміти по endpoint: 20 меток/год, 100 лайків/год, 60 коментарів/год, 10 auth/хв; default 60 req/хв
+- [x] **1.5.3** `429 Too Many Requests` з заголовком `Retry-After` (секунди)
+
+**Файли:**
+```
+backend/internal/middleware/ratelimit.go  (новий — RateLimit middleware)
+backend/cmd/server/main.go                (підключено r.Use(middleware.RateLimit()))
+tasks/BOARD.json                          (TASK-1.5 → merged)
+```
+
+**Гілка:** `feature/TASK-1.5` → merged into `main`
