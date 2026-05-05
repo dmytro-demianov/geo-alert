@@ -138,6 +138,7 @@ func main() {
 	r.GET("/me/subscriptions", authMW, subHandler.ListMySubscriptions)
 	r.GET("/feed", authMW, feedHandler.GetFeed)
 	r.GET("/ws", authMW, wsHandler.ServeWS)
+	r.GET("/ws/stats", wsHandler.Stats)
 	r.GET("/search", searchHandler.Search)
 	r.GET("/me/blocked", authMW, blockHandler.ListBlocked)
 

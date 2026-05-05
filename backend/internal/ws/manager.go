@@ -84,6 +84,24 @@ func (m *Manager) SendToUser(userID uuid.UUID, msg []byte) {
 	}
 }
 
+// ConnectedCount returns the number of currently connected clients.
+func (m *Manager) ConnectedCount() int {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	total := 0
+	for _, conns := range m.clients {
+		total += len(conns)
+	}
+	return total
+}
+
+// ConnectedUsers returns the number of unique users connected.
+func (m *Manager) ConnectedUsers() int {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	return len(m.clients)
+}
+
 // Broadcast sends a message to all connected clients.
 func (m *Manager) Broadcast(msg []byte) {
 	m.mu.RLock()
