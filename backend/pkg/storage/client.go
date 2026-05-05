@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	firebase "firebase.google.com/go/v4"
 	gcs "cloud.google.com/go/storage"
+	firebase "firebase.google.com/go/v4"
 	"github.com/google/uuid"
 	"google.golang.org/api/option"
 )

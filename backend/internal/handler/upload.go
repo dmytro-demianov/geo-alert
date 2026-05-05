@@ -22,7 +22,7 @@ func NewUploadHandler(storageClient *storage.Client) *UploadHandler {
 	return &UploadHandler{storage: storageClient}
 }
 
-// POST /upload/photo
+// UploadPhoto handles POST /upload/photo.
 // Accepts multipart/form-data with field "photo" (JPEG, PNG, or WebP, max 10 MB).
 // Returns {"url": "https://storage.googleapis.com/..."} on success.
 func (h *UploadHandler) UploadPhoto(c *gin.Context) {
@@ -49,7 +49,6 @@ func (h *UploadHandler) UploadPhoto(c *gin.Context) {
 		return
 	}
 
-	// Read file bytes (up to limit + 1 to detect oversize).
 	buf := make([]byte, header.Size)
 	if _, err := file.Read(buf); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
