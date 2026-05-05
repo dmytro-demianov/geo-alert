@@ -14,8 +14,8 @@
   },
 
   "active_agents": {
-    "backend": null,
-    "frontend": null,
+    "backend": "agent-backend-1",
+    "frontend": "agent-frontend-1",
     "ops": null
   },
 
@@ -111,13 +111,13 @@
       "title": "Cards CRUD",
       "epic": "EPIC-2",
       "agent": "backend",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": ["TASK-1.3", "TASK-1.4"],
-      "agent_instance": null,
-      "started_at": null,
+      "agent_instance": "agent-backend-1",
+      "started_at": "2026-05-05T12:00:00Z",
       "done_at": null,
       "merged_at": null,
-      "branch": null,
+      "branch": "feature/TASK-2.1",
       "progress_notes": null,
       "error": null
     },
@@ -380,13 +380,13 @@
       "title": "Карта (Leaflet)",
       "epic": "EPIC-5",
       "agent": "frontend",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": ["TASK-5.1"],
-      "agent_instance": null,
-      "started_at": null,
+      "agent_instance": "agent-frontend-1",
+      "started_at": "2026-05-05T12:00:00Z",
       "done_at": null,
       "merged_at": null,
-      "branch": null,
+      "branch": "feature/TASK-5.3",
       "progress_notes": null,
       "error": null
     },
