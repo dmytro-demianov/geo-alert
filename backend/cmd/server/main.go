@@ -7,8 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
+	"github.com/dmytro-demianov/geo-alert/internal/auth"
 	"github.com/dmytro-demianov/geo-alert/internal/config"
+	"github.com/dmytro-demianov/geo-alert/internal/handler"
+	"github.com/dmytro-demianov/geo-alert/internal/middleware"
+	"github.com/dmytro-demianov/geo-alert/internal/repository"
 	"github.com/dmytro-demianov/geo-alert/pkg/logger"
+	"github.com/dmytro-demianov/geo-alert/pkg/migrator"
 )
 
 func main() {
@@ -18,6 +23,24 @@ func main() {
 	}
 
 	logger.Init(cfg.Server.Env)
+
+	db, err := repository.NewDB(&cfg.DB)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to connect to database")
+	}
+
+	if err := migrator.Run(cfg.DB.URL(), "file://migrations"); err != nil {
+		log.Fatal().Err(err).Msg("failed to run migrations")
+	}
+
+	jwtSvc := auth.NewJWTService(cfg.Auth.JWTSecret)
+	googleOAuth := auth.NewGoogleOAuth(cfg.Auth.GoogleClientID, cfg.Auth.GoogleClientSecret)
+
+	userRepo := repository.NewUserRepo(db)
+	tokenRepo := repository.NewRefreshTokenRepo(db)
+
+	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
+	authMW := middleware.AuthRequired(jwtSvc)
 
 	if cfg.Server.Env == "production" {
 		gin.SetMode(gin.ReleaseMode)
@@ -33,6 +56,14 @@ func main() {
 			"time":   time.Now().UTC().Format(time.RFC3339),
 		})
 	})
+
+	authGroup := r.Group("/auth")
+	{
+		authGroup.POST("/google", authHandler.GoogleAuth)
+		authGroup.POST("/refresh", authHandler.Refresh)
+		authGroup.POST("/logout", authHandler.Logout)
+		authGroup.GET("/me", authMW, authHandler.Me)
+	}
 
 	addr := ":" + cfg.Server.Port
 	log.Info().Str("addr", addr).Str("env", cfg.Server.Env).Msg("server starting")
