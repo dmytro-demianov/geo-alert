@@ -569,3 +569,51 @@ backend/cmd/server/main.go             (searchRepo, searchHandler, GET /search)
 ```
 
 **Ветка:** `feature/TASK-3.5` → merged into `main`
+
+---
+
+## Сессия 5 — 2026-05-05 · агент: backend-6
+
+---
+
+### [TASK-4.1-A] WebSocket: Connection Manager
+
+**Микрозадачи:**
+- [x] **4.1.1** `GET /ws` — WebSocket endpoint с JWT auth (gorilla/websocket upgrader)
+- [x] **4.1.2** `Manager` — хранит активные соединения `map[userID][]*Client`, поддерживает несколько соединений на юзера
+- [x] `Register` / `Unregister` — потокобезопасно через `sync.RWMutex`
+- [x] `SendToUser` / `Broadcast` — non-blocking (drop при полном буфере с warn)
+- [x] `readPump` / `writePump` — goroutine per connection, ping каждые 45s, pong timeout 60s
+- [x] `NewClient` + `SetConn` — конструктор с буферизованным `send` каналом (256)
+
+**Файлы:**
+```
+backend/internal/ws/manager.go   (новый — Manager + Client)
+backend/internal/handler/ws.go   (новый — WSHandler.ServeWS)
+backend/cmd/server/main.go       (wsManager, wsHandler, GET /ws)
+backend/go.mod                   (gorilla/websocket v1.5.3, firebase.google.com/go/v4 v4.19.0)
+```
+
+**Ветка:** `feature/TASK-4.1-A` → merged into `main`
+
+---
+
+### [TASK-4.3-A] FCM: Firebase Admin SDK + сохранение токена
+
+**Микрозадачи:**
+- [x] **4.3.1** `pkg/fcm/client.go` — Firebase Admin SDK init (serviceAccountJSON или ADC), `SendToToken`, `SendToTokens` (multicast, обработка `registration-token-not-registered`), `DataPayload`
+- [x] **4.3.2** `POST /users/me/fcm-token` — сохранение FCM registration token в `users.fcm_token`
+- [x] **4.3.5** Logout очищает FCM token (`ClearFCMToken` через `optionalAuth` на `/auth/logout`)
+- [x] `UserRepo`: `UpdateFCMToken`, `ClearFCMToken`, `FindByFCMToken`
+- [x] FCM init в main.go — warn если не настроен, не паникует (graceful degradation)
+
+**Файлы:**
+```
+backend/pkg/fcm/client.go           (новый — FCM Client)
+backend/internal/repository/user.go (UpdateFCMToken/ClearFCMToken/FindByFCMToken)
+backend/internal/handler/user.go    (SaveFCMToken)
+backend/internal/handler/auth.go    (Logout + ClearFCMToken)
+backend/cmd/server/main.go          (fcm.New, POST /users/me/fcm-token)
+```
+
+**Ветка:** `feature/TASK-4.3-A` → merged into `main`

@@ -582,16 +582,16 @@
       "title": "WebSocket: Connection Manager",
       "epic": "EPIC-4",
       "agent": "backend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-1.4"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-backend-6",
+      "started_at": "2026-05-05T21:30:00Z",
+      "done_at": "2026-05-05T22:00:00Z",
+      "merged_at": "2026-05-05T22:00:00Z",
+      "branch": "feature/TASK-4.1-A",
+      "progress_notes": "done: internal/ws/manager.go (Manager: Register/Unregister/SendToUser/Broadcast; Client: readPump/writePump, ping-pong 45s), handler/ws.go (gorilla/websocket upgrader, GET /ws authMW)",
       "error": null
     },
     "TASK-4.1-B": {
@@ -630,16 +630,16 @@
       "title": "FCM: Firebase Admin SDK + збереження токена",
       "epic": "EPIC-4",
       "agent": "backend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-1.4"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-backend-6",
+      "started_at": "2026-05-05T21:30:00Z",
+      "done_at": "2026-05-05T22:30:00Z",
+      "merged_at": "2026-05-05T22:30:00Z",
+      "branch": "feature/TASK-4.3-A",
+      "progress_notes": "done: pkg/fcm/client.go (New/SendToToken/SendToTokens с обработкой невалидных токенов/DataPayload), UserRepo (UpdateFCMToken/ClearFCMToken/FindByFCMToken), POST /users/me/fcm-token, Logout очищает FCM token",
       "error": null
     },
     "TASK-4.3-B": {
