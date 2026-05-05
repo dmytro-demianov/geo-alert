@@ -163,6 +163,7 @@ function UserButton({ onLogin }: { onLogin: () => void }) {
 
   const items: { label: string; icon: string; path: string }[] = [
     { label: 'Профіль', icon: 'user', path: user ? `/users/${user.id}` : '/' },
+    { label: 'Стрічка активності', icon: 'list', path: '/feed' },
     { label: 'Мої позначки', icon: 'map-pin', path: '/my-cards' },
     { label: 'Підписки', icon: 'heart', path: '/' },
     { label: 'Заблоковані', icon: 'alert-circle', path: '/settings/blocked' },

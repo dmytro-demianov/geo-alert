@@ -6,6 +6,7 @@ import AuthCallbackPage from '@/pages/AuthCallbackPage'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import UserProfilePage from '@/pages/UserProfilePage'
 import BlockedSettingsPage from '@/pages/BlockedSettingsPage'
+import FeedPage from '@/pages/FeedPage'
 import { useAuthStore } from '@/store/auth'
 import { fetchMe } from '@/api/auth'
 
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/" element={<MapPage />} />
           <Route path="/users/:id" element={<UserProfilePage />} />
           <Route path="/settings/blocked" element={<BlockedSettingsPage />} />
+          <Route path="/feed" element={<FeedPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
