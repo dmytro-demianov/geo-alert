@@ -41,11 +41,13 @@ func main() {
 	cardRepo := repository.NewCardRepo(db)
 	markerRepo := repository.NewMarkerRepo(db)
 	subRepo := repository.NewSubscriptionRepo(db)
+	commentRepo := repository.NewCommentRepo(db)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
 	cardHandler := handler.NewCardHandler(cardRepo)
 	markerHandler := handler.NewMarkerHandler(markerRepo, cardRepo)
 	subHandler := handler.NewSubscriptionHandler(subRepo, cardRepo)
+	commentHandler := handler.NewCommentHandler(commentRepo, markerRepo, cardRepo)
 	authMW := middleware.AuthRequired(jwtSvc)
 	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
@@ -87,7 +89,11 @@ func main() {
 		markers.GET("/:id", optionalAuthMW, markerHandler.GetMarker)
 		markers.PUT("/:id", authMW, markerHandler.UpdateMarker)
 		markers.DELETE("/:id", authMW, markerHandler.DeleteMarker)
+		markers.GET("/:id/comments", commentHandler.ListComments)
+		markers.POST("/:id/comments", authMW, commentHandler.CreateComment)
 	}
+
+	r.DELETE("/comments/:id", authMW, commentHandler.DeleteComment)
 
 	cardMarkers := r.Group("/cards/:id/markers")
 	{
