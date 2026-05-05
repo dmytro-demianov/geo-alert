@@ -12,6 +12,7 @@ import (
 	"github.com/dmytro-demianov/geo-alert/internal/handler"
 	"github.com/dmytro-demianov/geo-alert/internal/middleware"
 	"github.com/dmytro-demianov/geo-alert/internal/repository"
+	"github.com/dmytro-demianov/geo-alert/internal/ws"
 	"github.com/dmytro-demianov/geo-alert/pkg/logger"
 	"github.com/dmytro-demianov/geo-alert/pkg/migrator"
 )
@@ -58,6 +59,8 @@ func main() {
 	blockHandler := handler.NewBlockHandler(blockRepo, cardRepo, subRepo)
 	feedHandler := handler.NewFeedHandler(feedRepo)
 	searchHandler := handler.NewSearchHandler(searchRepo)
+	wsManager := ws.NewManager()
+	wsHandler := handler.NewWSHandler(wsManager)
 	authMW := middleware.AuthRequired(jwtSvc)
 	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
@@ -124,6 +127,7 @@ func main() {
 	}
 	r.GET("/me/subscriptions", authMW, subHandler.ListMySubscriptions)
 	r.GET("/feed", authMW, feedHandler.GetFeed)
+	r.GET("/ws", authMW, wsHandler.ServeWS)
 	r.GET("/search", searchHandler.Search)
 	r.GET("/me/blocked", authMW, blockHandler.ListBlocked)
 
