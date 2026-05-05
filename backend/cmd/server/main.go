@@ -51,6 +51,7 @@ func main() {
 	commentHandler := handler.NewCommentHandler(commentRepo, markerRepo, cardRepo)
 	likeHandler := handler.NewLikeHandler(likeRepo, markerRepo)
 	viewHandler := handler.NewViewHandler(markerRepo)
+	userHandler := handler.NewUserHandler(userRepo, cardRepo)
 	authMW := middleware.AuthRequired(jwtSvc)
 	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
@@ -86,6 +87,7 @@ func main() {
 		cards.PUT("/:id", authMW, cardHandler.UpdateCard)
 		cards.DELETE("/:id", authMW, cardHandler.DeleteCard)
 	}
+	r.GET("/users/:id", userHandler.GetUser)
 	r.GET("/users/:id/cards", optionalAuthMW, cardHandler.ListByOwner)
 
 	markers := r.Group("/markers")
