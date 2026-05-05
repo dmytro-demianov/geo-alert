@@ -176,3 +176,50 @@ frontend/src/ws/client.ts
 ```
 
 **Ветка:** `feature/TASK-5.1` → merged into `main`
+
+---
+
+## Сессия 3 — 2026-05-05 · агенты: backend + frontend (параллельно)
+
+---
+
+### [TASK-2.1] Cards CRUD
+
+**Микрозадачи:**
+- [x] `internal/domain/card.go` — модель `Card`: ID (uuid), OwnerID, Title, Description, IsPublic, TTLHours, ViewCount, soft delete через `DeletedAt *time.Time`
+- [x] `internal/repository/card.go` — `CardRepo`: `Create`, `FindByID` (исключает soft-deleted), `FindByOwnerID` (pagination), `FindPublic` (IsPublic=true, pagination), `Update` (db.Save), `Delete` (soft delete + проверка owner), `IncrementViewCount`
+- [x] `internal/handler/card.go` — `CardHandler` с 5 endpoints: `POST /cards` (title required, max 200 символов, 201), `GET /cards` (limit/offset, без auth), `GET /cards/:id` (приватные только owner, инкремент ViewCount), `GET /users/:id/cards` (фильтрация приватных для чужих), `PUT /cards/:id` (owner only, 403), `DELETE /cards/:id` (owner only, soft delete)
+- [x] `cmd/server/main.go` — CardRepo + CardHandler wire-up, регистрация роутов `/cards` + `/users/:id/cards`
+
+**Файлы:**
+```
+backend/internal/domain/card.go        (новый)
+backend/internal/repository/card.go    (новый)
+backend/internal/handler/card.go       (новый)
+backend/cmd/server/main.go             (добавлены card routes)
+```
+
+**Ветка:** `feature/TASK-2.1` → merged into `main`
+
+---
+
+### [TASK-5.3] Карта (Leaflet)
+
+**Микрозадачи:**
+- [x] `npm install leaflet react-leaflet @types/leaflet`
+- [x] `src/hooks/useGeolocation.ts` — хук с `watchPosition`, возвращает `{ position, error, loading }`, cleanup при unmount
+- [x] `src/components/Map/MapView.tsx` — `MapContainer` + `TileLayer` (OpenStreetMap), `CircleMarker` текущей позиции, спиннер при `loading`, fix иконок Leaflet для Vite через `new URL(..., import.meta.url)`
+- [x] `src/pages/MapPage.tsx` — страница-обёртка `w-full h-screen overflow-hidden`
+- [x] `src/App.tsx` — роут `/` заменён с заглушки на `<MapPage />`
+
+**Файлы:**
+```
+frontend/src/hooks/useGeolocation.ts           (новый)
+frontend/src/components/Map/MapView.tsx        (новый)
+frontend/src/pages/MapPage.tsx                 (новый)
+frontend/src/App.tsx                           (обновлён)
+frontend/package.json                          (добавлены leaflet зависимости)
+frontend/package-lock.json
+```
+
+**Ветка:** `feature/TASK-5.3` → merged into `main`
