@@ -748,3 +748,31 @@ backend/cmd/server/main.go                             (cooldownRepo + notifServ
 ```
 
 **Гілка:** `feature/TASK-4.2-TASK-4.3-B` → merged into `main`
+
+---
+
+## Сессия 7 — 2026-05-05 · агент: backend-10
+
+---
+
+### [TASK-6.3] PostgreSQL оптимізація
+
+**Мікрозадачі:**
+- [x] **6.3.1** Міграція `012_pg_optimizations.up.sql` — GIST індекс `idx_markers_location_gist` на `markers.location` (для ST_DWithin)
+- [x] **6.3.2/6.3.3** Partial indexes: `idx_markers_active` (card_id + created_at DESC WHERE deleted_at IS NULL), `idx_markers_pagination` (created_at DESC + id WHERE deleted_at IS NULL)
+- [x] **6.3.2** Partial index для TTL-воркера: `idx_markers_expires_at_partial` (expires_at WHERE deleted_at IS NULL AND expires_at IS NOT NULL)
+- [x] **6.3.1** Full-text search GIN індекс: `idx_markers_fts` (to_tsvector('russian', title || description))
+- [x] Partial index для коментарів: `idx_comments_marker_id_partial` (marker_id + created_at DESC WHERE deleted_at IS NULL)
+- [x] Індекс для notification_cooldowns: `idx_notif_cooldowns_marker` (marker_id)
+- [x] **6.3.5** Connection pool оновлено в `db.go`: MaxOpenConns=25, MaxIdleConns=10, ConnMaxLifetime=5m, ConnMaxIdleTime=2m
+- [x] Всі нові індекси використовують `CREATE INDEX IF NOT EXISTS` — безпечно для повторного запуску
+- [x] Перевірено що нові індекси не дублюють існуючі з migration 009
+
+**Файли:**
+```
+backend/migrations/012_pg_optimizations.up.sql    (новий)
+backend/migrations/012_pg_optimizations.down.sql  (новий)
+backend/internal/repository/db.go                 (оновлено — connection pool)
+```
+
+**Гілка:** `feature/TASK-6.3` → merged into `main`

@@ -444,16 +444,16 @@
       "title": "Лента активности UI",
       "epic": "EPIC-5",
       "agent": "frontend",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "TASK-5.1",
         "TASK-3.4"
       ],
-      "agent_instance": null,
-      "started_at": null,
+      "agent_instance": "agent-frontend-5",
+      "started_at": "2026-05-05T00:00:00Z",
       "done_at": null,
       "merged_at": null,
-      "branch": null,
+      "branch": "feature/TASK-5.8",
       "progress_notes": null,
       "error": null
     },
@@ -530,16 +530,16 @@
       "title": "PostgreSQL оптимизация",
       "epic": "EPIC-6",
       "agent": "backend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-2.2"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-backend-10",
+      "started_at": "2026-05-05T00:00:00Z",
+      "done_at": "2026-05-05T00:00:00Z",
+      "merged_at": "2026-05-05T00:00:00Z",
+      "branch": "feature/TASK-6.3",
+      "progress_notes": "done: міграція 012_pg_optimizations (GIST індекс на markers.location, partial indexes для активних маркерів/пагінації/TTL/FTS/коментарів/cooldowns); connection pool оновлено (MaxOpen=25, MaxIdle=10, ConnMaxLifetime=5m, ConnMaxIdleTime=2m)",
       "error": null
     },
     "TASK-6.4": {
