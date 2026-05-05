@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Icon from './ui/Icon'
 import Avatar from './ui/Avatar'
 import { useAuthStore } from '@/store/auth'
 import { logoutRequest } from '@/api/auth'
+import { notificationsApi, AppNotification } from '@/api/notifications'
+import { wsClient } from '@/ws/client'
 
 interface TopBarProps {
   onMenuToggle: () => void
@@ -31,10 +33,69 @@ function SearchBar() {
   )
 }
 
+const NOTIF_ICONS: Record<string, { icon: string; color: string }> = {
+  NEW_LIKE:        { icon: 'heart',      color: '#EF4444' },
+  NEW_COMMENT:     { icon: 'message',    color: '#3B82F6' },
+  NEW_MENTION:     { icon: 'at-sign',    color: '#8B5CF6' },
+  NEW_SUBSCRIBER:  { icon: 'user',       color: '#10B981' },
+  GEO_ENTER:       { icon: 'map-pin',    color: '#F59E0B' },
+  GEO_APPROACH:    { icon: 'map-pin',    color: '#F59E0B' },
+  REPORT_RECEIVED: { icon: 'alert-circle', color: '#EF4444' },
+  CARD_PRIVATE:    { icon: 'layers',     color: '#6B7280' },
+}
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const m = Math.floor(diff / 60_000)
+  if (m < 1) return 'щойно'
+  if (m < 60) return `${m} хв`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h} г`
+  return `${Math.floor(h / 24)} д`
+}
+
 function NotificationsButton() {
   const [open, setOpen] = useState(false)
+  const [notifications, setNotifications] = useState<AppNotification[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [loading, setLoading] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const { isAuthenticated } = useAuthStore()
 
+  const fetchNotifications = useCallback(async () => {
+    if (!isAuthenticated) return
+    try {
+      setLoading(true)
+      const [notifsRes, countRes] = await Promise.all([
+        notificationsApi.getNotifications(20),
+        notificationsApi.getUnreadCount(),
+      ])
+      setNotifications(notifsRes.data.notifications)
+      setUnreadCount(countRes.data.count)
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false)
+    }
+  }, [isAuthenticated])
+
+  useEffect(() => {
+    fetchNotifications()
+  }, [fetchNotifications])
+
+  // Real-time: new notification via WS
+  useEffect(() => {
+    const handler = (msg: unknown) => {
+      const data = msg as { notification: AppNotification }
+      if (!data.notification) return
+      setNotifications((prev) => [data.notification, ...prev])
+      setUnreadCount((c) => c + 1)
+    }
+    wsClient.on('new_notification', handler)
+    return () => wsClient.off('new_notification', handler)
+  }, [])
+
+  // Close on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
@@ -43,22 +104,45 @@ function NotificationsButton() {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const notifications = [
-    { icon: 'bell', color: '#EF4444', title: 'Ви поруч з 3 позначками', sub: '«Цікаві місця Києва» · ≈ 120 м', time: 'щойно', unread: true },
-    { icon: 'message', color: '#3B82F6', title: 'Михайло прокоментував «Золоті ворота»', sub: '«Чудове місце!»', time: '12 хв', unread: true },
-    { icon: 'heart', color: '#EF4444', title: 'Анна К. вподобала «Скейт-парк»', sub: '+1 · тепер 5', time: '1 г', unread: true },
-    { icon: 'map-pin', color: '#10B981', title: 'Нова позначка в «Кафе з Wi-Fi»', sub: "Кав'ярня \"Один\" · додав Михайло", time: '3 г', unread: false },
-    { icon: 'clock', color: '#F59E0B', title: 'Ваша позначка скоро зникне', sub: '«Виставка фотографій» · 2 г залишилось', time: '5 г', unread: false },
-  ]
+  const handleOpen = () => {
+    setOpen((v) => !v)
+    if (!open) fetchNotifications()
+  }
+
+  const handleMarkRead = async (id: string) => {
+    try {
+      await notificationsApi.markRead(id)
+      setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, is_read: true } : n))
+      setUnreadCount((c) => Math.max(0, c - 1))
+    } catch {
+      // ignore
+    }
+  }
+
+  const handleMarkAllRead = async () => {
+    try {
+      await notificationsApi.markAllRead()
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })))
+      setUnreadCount(0)
+    } catch {
+      // ignore
+    }
+  }
+
+  if (!isAuthenticated) return null
 
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={handleOpen}
         className="relative w-9 h-9 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors"
       >
         <Icon name="bell" size={20} />
-        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-500 rounded-full border-[1.5px] border-white" />
+        {unreadCount > 0 && (
+          <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-brand-500 rounded-full border-[1.5px] border-white flex items-center justify-center text-[9px] font-bold text-white px-0.5">
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </span>
+        )}
       </button>
 
       {open && (
@@ -67,27 +151,48 @@ function NotificationsButton() {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="px-4 py-3 border-b border-slate-100 flex items-center">
-            <span className="text-sm font-bold text-slate-900 flex-1">Стрічка</span>
-            <button className="text-xs font-semibold text-brand-600 hover:text-brand-700 transition-colors">Усе прочитано</button>
+            <span className="text-sm font-bold text-slate-900 flex-1">Сповіщення</span>
+            {unreadCount > 0 && (
+              <button
+                onClick={handleMarkAllRead}
+                className="text-xs font-semibold text-brand-600 hover:text-brand-700 transition-colors"
+              >
+                Усе прочитано
+              </button>
+            )}
           </div>
           <div className="max-h-[400px] overflow-y-auto">
-            {notifications.map((n, i) => (
-              <div key={i} className={`px-4 py-3 flex gap-2.5 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors ${n.unread ? 'bg-brand-50' : ''}`}>
-                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white" style={{ background: n.color }}>
-                  <Icon name={n.icon} size={14} stroke="white" strokeWidth={2.2} />
+            {loading && notifications.length === 0 && (
+              <div className="py-8 text-center text-sm text-slate-400">Завантаження…</div>
+            )}
+            {!loading && notifications.length === 0 && (
+              <div className="py-8 text-center text-sm text-slate-400">Немає сповіщень</div>
+            )}
+            {notifications.map((n) => {
+              const { icon, color } = NOTIF_ICONS[n.type] ?? { icon: 'bell', color: '#6B7280' }
+              return (
+                <div
+                  key={n.id}
+                  onClick={() => !n.is_read && handleMarkRead(n.id)}
+                  className={`px-4 py-3 flex gap-2.5 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors ${!n.is_read ? 'bg-brand-50' : ''}`}
+                >
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white"
+                    style={{ background: color }}
+                  >
+                    <Icon name={icon} size={14} stroke="white" strokeWidth={2.2} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className={`text-[13px] text-slate-900 leading-snug ${!n.is_read ? 'font-semibold' : 'font-medium'}`}>
+                      {n.message}
+                    </div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">{timeAgo(n.created_at)}</div>
+                  </div>
+                  {!n.is_read && <span className="w-2 h-2 rounded-full bg-brand-500 mt-1.5 flex-shrink-0" />}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className={`text-[13px] text-slate-900 leading-snug ${n.unread ? 'font-semibold' : 'font-medium'}`}>{n.title}</div>
-                  <div className="text-xs text-slate-500 mt-0.5">{n.sub}</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">{n.time}</div>
-                </div>
-                {n.unread && <span className="w-2 h-2 rounded-full bg-brand-500 mt-1.5 flex-shrink-0" />}
-              </div>
-            ))}
+              )
+            })}
           </div>
-          <button className="w-full py-3 bg-slate-50 text-[13px] font-semibold text-slate-500 hover:bg-slate-100 transition-colors">
-            Усі сповіщення →
-          </button>
         </div>
       )}
     </div>

@@ -59,6 +59,7 @@ func main() {
 	locationRepo := repository.NewLocationRepo(db)
 	cooldownRepo := repository.NewCooldownRepo(db)
 	notifRepo := repository.NewNotificationRepo(db)
+	reportRepo := repository.NewReportRepo(db)
 
 	wsManager := ws.NewManager()
 
@@ -84,6 +85,7 @@ func main() {
 	commentHandler := handler.NewCommentHandler(commentRepo, markerRepo, cardRepo, wsManager, notifRepo)
 	likeHandler := handler.NewLikeHandler(likeRepo, markerRepo, wsManager, notifRepo)
 	notifHandler := handler.NewNotificationHandler(notifRepo)
+	reportHandler := handler.NewReportHandler(reportRepo, markerRepo, notifRepo, wsManager)
 	viewHandler := handler.NewViewHandler(markerRepo)
 	userHandler := handler.NewUserHandler(userRepo, cardRepo, tokenRepo)
 	blockHandler := handler.NewBlockHandler(blockRepo, cardRepo, subRepo)
@@ -143,6 +145,7 @@ func main() {
 		markers.POST("/:id/likes", authMW, likeHandler.ToggleLike)
 		markers.GET("/:id/comments", commentHandler.ListComments)
 		markers.POST("/:id/comments", authMW, commentHandler.CreateComment)
+		markers.POST("/:id/reports", authMW, reportHandler.CreateReport)
 	}
 
 	r.DELETE("/comments/:id", authMW, commentHandler.DeleteComment)

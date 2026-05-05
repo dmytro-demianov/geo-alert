@@ -993,3 +993,72 @@ frontend/src/App.tsx                    (роут /search + import SearchPage)
 ```
 
 **Гілка:** `feature/TASK-5.9` → merged into `main`
+
+---
+
+### [TASK-2.7] Жалобы (reports) — backend
+
+**Мікрозадачі:**
+- [x] `domain/report.go` — Report struct (reporter_id, marker_id, reason, comment)
+- [x] `repository/report.go` — Create з перевіркою дубля (один юзер → одна скарга на мітку), FindByMarkerID
+- [x] `handler/report.go` — POST /markers/:id/reports (валідація reason enum, заборона self-report, нотифікація owner мітки через WS)
+- [x] Роут `POST /markers/:id/reports` у main.go з authMW
+- [x] `reportRepo` та `reportHandler` ін'єктовані в main.go
+
+**Файли:**
+```
+backend/internal/domain/report.go
+backend/internal/repository/report.go
+backend/internal/handler/report.go
+backend/cmd/server/main.go             (reportRepo, reportHandler, роут)
+```
+
+**Гілка:** `feature/TASK-2.7` → merged into `main`
+
+---
+
+### [TASK-5.10] Уведомления UI + PWA — frontend
+
+**Мікрозадачі:**
+- [x] `api/notifications.ts` — AppNotification інтерфейс, getNotifications/getUnreadCount/markRead/markAllRead
+- [x] `NotificationsButton` у TopBar — реальний API, unread badge з лічильником, mark-as-read по кліку на елемент, "Усе прочитано", WS new_notification → prepend + інкремент unread
+- [x] `components/Toast.tsx` — ToastContainer, showToast(), auto-dismiss 4s
+- [x] `hooks/usePushNotifications.ts` — SW реєстрація, Notification.requestPermission(), WS→toast
+- [x] `public/sw.js` — push event handler, notificationclick→focus/openWindow, offline cache
+- [x] `public/offline.html` — offline fallback сторінка
+- [x] WS client bugfix: `cb(msg)` замість `cb(msg.data)` — всі WS хендлери тепер отримують повний об'єкт
+- [x] `App.tsx` — PushInit компонент + ToastContainer
+
+**Файли:**
+```
+frontend/src/api/notifications.ts
+frontend/src/components/TopBar.tsx      (NotificationsButton → реальний API)
+frontend/src/components/Toast.tsx
+frontend/src/hooks/usePushNotifications.ts
+frontend/src/ws/client.ts              (bugfix: msg замість msg.data)
+frontend/src/App.tsx                   (PushInit, ToastContainer)
+frontend/public/sw.js
+frontend/public/offline.html
+```
+
+**Гілка:** `feature/TASK-5.10` → merged into `main`
+
+---
+
+### [TASK-1.2] Docker Setup — ops
+
+**Мікрозадачі:**
+- [x] `backend/Dockerfile` — multi-stage (golang:1.22-alpine builder + alpine:3.19 runtime, migrations включено)
+- [x] `docker-compose.yml` — сервіси: postgres (postgis/postgis:16-3.4-alpine, healthcheck), backend (залежить від healthy postgres), adminer
+- [x] `Makefile` — команди: dev, build, migrate/migrate-down/migrate-status, test, docker-up/down/logs/db, lint, tidy
+- [x] `.env.example` у корені — всі змінні з дефолтами, включно з CORS_ALLOWED_ORIGINS, TTL_WORKER_INTERVAL_MINUTES, FCM_CLEANUP_INTERVAL_HOURS
+
+**Файли:**
+```
+backend/Dockerfile
+docker-compose.yml
+Makefile
+.env.example
+```
+
+**Гілка:** `feature/TASK-1.2` → merged into `main`

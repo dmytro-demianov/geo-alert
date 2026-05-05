@@ -35,16 +35,16 @@
       "title": "Docker Setup",
       "epic": "EPIC-1",
       "agent": "ops",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-1.1"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-ops-1",
+      "started_at": "2026-05-06T10:30:00Z",
+      "done_at": "2026-05-06T11:00:00Z",
+      "merged_at": "2026-05-06T11:00:00Z",
+      "branch": "feature/TASK-1.2",
+      "progress_notes": "done: backend/Dockerfile (multi-stage builder+alpine, migrations copied), docker-compose.yml (postgres/postgis:16, backend, adminer, healthcheck), Makefile (dev/build/migrate/test/docker-up/lint), .env.example у корені з усіма змінними",
       "error": null
     },
     "TASK-1.3": {
@@ -212,17 +212,17 @@
       "title": "Жалобы (reports)",
       "epic": "EPIC-2",
       "agent": "backend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-2.2",
         "TASK-4.4"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-backend-12",
+      "started_at": "2026-05-06T10:30:00Z",
+      "done_at": "2026-05-06T11:00:00Z",
+      "merged_at": "2026-05-06T11:00:00Z",
+      "branch": "feature/TASK-2.7",
+      "progress_notes": "done: domain/report.go, repository/report.go (Create з дедупл. per-user, FindByMarkerID), handler/report.go (POST /markers/:id/reports — валідація reason, self-report guard, notif owner через WS), роут в main.go",
       "error": null
     },
     "TASK-3.1": {
@@ -478,18 +478,18 @@
       "title": "Уведомления UI + PWA",
       "epic": "EPIC-5",
       "agent": "frontend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-5.1",
         "TASK-4.3",
         "TASK-4.4"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-frontend-7",
+      "started_at": "2026-05-06T10:30:00Z",
+      "done_at": "2026-05-06T11:00:00Z",
+      "merged_at": "2026-05-06T11:00:00Z",
+      "branch": "feature/TASK-5.10",
+      "progress_notes": "done: api/notifications.ts (getNotifications/getUnreadCount/markRead/markAllRead); NotificationsButton в TopBar — реальний API, unread badge, mark-as-read по кліку, WS new_notification → prepend; Toast компонент + showToast() + ToastContainer в App.tsx; usePushNotifications хук (SW реєстрація + push permission); public/sw.js (push/notificationclick/offline cache); public/offline.html; WS client bugfix (msg замість msg.data)",
       "error": null
     },
     "TASK-5.11": {

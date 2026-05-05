@@ -24,8 +24,8 @@ class WebSocketClient {
 
     this.ws.onmessage = (event) => {
       try {
-        const msg = JSON.parse(event.data as string) as { type: string; data: unknown }
-        this.handlers.get(msg.type)?.forEach((cb) => cb(msg.data))
+        const msg = JSON.parse(event.data as string) as { type: string } & Record<string, unknown>
+        this.handlers.get(msg.type)?.forEach((cb) => cb(msg))
       } catch {
         // ignore malformed messages
       }

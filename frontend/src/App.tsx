@@ -8,6 +8,8 @@ import UserProfilePage from '@/pages/UserProfilePage'
 import BlockedSettingsPage from '@/pages/BlockedSettingsPage'
 import FeedPage from '@/pages/FeedPage'
 import SearchPage from '@/pages/SearchPage'
+import { ToastContainer } from '@/components/Toast'
+import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { useAuthStore } from '@/store/auth'
 import { fetchMe } from '@/api/auth'
 
@@ -32,10 +34,17 @@ function AuthInit() {
   return null
 }
 
+function PushInit() {
+  usePushNotifications()
+  return null
+}
+
 export default function App() {
   return (
     <>
       <AuthInit />
+      <PushInit />
+      <ToastContainer />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
