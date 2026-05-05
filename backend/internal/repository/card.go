@@ -68,6 +68,14 @@ func (r *CardRepo) Delete(id uuid.UUID, ownerID uuid.UUID) error {
 		Update("deleted_at", now).Error
 }
 
+func (r *CardRepo) CountPublicByOwner(ownerID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.Model(&domain.Card{}).
+		Where("owner_id = ? AND is_public = true AND deleted_at IS NULL", ownerID).
+		Count(&count).Error
+	return count, err
+}
+
 func (r *CardRepo) IncrementViewCount(id uuid.UUID) error {
 	return r.db.Model(&domain.Card{}).
 		Where("id = ? AND deleted_at IS NULL", id).
