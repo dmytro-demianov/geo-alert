@@ -30,9 +30,14 @@ func NewDB(cfg *config.DBConfig) (*gorm.DB, error) {
 		return nil, fmt.Errorf("get sql.DB: %w", err)
 	}
 
-	sqlDB.SetMaxOpenConns(cfg.MaxConns)
-	sqlDB.SetMaxIdleConns(cfg.MaxConns / 2)
-	sqlDB.SetConnMaxLifetime(30 * time.Minute)
+	maxOpen := cfg.MaxConns
+	if maxOpen <= 0 {
+		maxOpen = 25
+	}
+	sqlDB.SetMaxOpenConns(maxOpen)
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetConnMaxLifetime(5 * time.Minute)
+	sqlDB.SetConnMaxIdleTime(2 * time.Minute)
 
 	if err := sqlDB.Ping(); err != nil {
 		return nil, fmt.Errorf("ping db: %w", err)
