@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -8,15 +9,26 @@ import (
 
 	"github.com/dmytro-demianov/geo-alert/internal/domain"
 	"github.com/dmytro-demianov/geo-alert/internal/repository"
+	"github.com/dmytro-demianov/geo-alert/internal/ws"
 )
 
 type LikeHandler struct {
 	likes   *repository.LikeRepo
 	markers *repository.MarkerRepo
+	wsHub   *ws.Manager
 }
 
-func NewLikeHandler(likes *repository.LikeRepo, markers *repository.MarkerRepo) *LikeHandler {
-	return &LikeHandler{likes: likes, markers: markers}
+func NewLikeHandler(likes *repository.LikeRepo, markers *repository.MarkerRepo, wsHub *ws.Manager) *LikeHandler {
+	return &LikeHandler{likes: likes, markers: markers, wsHub: wsHub}
+}
+
+func (h *LikeHandler) broadcastLikeUpdate(markerID uuid.UUID, likeWeight int) {
+	msg, _ := json.Marshal(map[string]any{
+		"type":        "like_update",
+		"marker_id":   markerID,
+		"like_weight": likeWeight,
+	})
+	h.wsHub.Broadcast(msg)
 }
 
 type likeRequest struct {
@@ -89,6 +101,7 @@ func (h *LikeHandler) ToggleLike(c *gin.Context) {
 		if updated != nil {
 			weight = updated.LikeWeight
 		}
+		h.broadcastLikeUpdate(markerID, weight)
 		c.JSON(http.StatusOK, gin.H{
 			"action":      "removed",
 			"like_weight": weight,
@@ -120,6 +133,7 @@ func (h *LikeHandler) ToggleLike(c *gin.Context) {
 		action = "disliked"
 	}
 
+	h.broadcastLikeUpdate(markerID, weight)
 	c.JSON(http.StatusOK, gin.H{
 		"action":      action,
 		"like_weight": weight,
