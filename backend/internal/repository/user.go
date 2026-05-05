@@ -66,6 +66,13 @@ func (r *UserRepo) FindByFCMToken(token string) ([]domain.User, error) {
 	return users, err
 }
 
+func (r *UserRepo) FindWithFCMToken(limit int) ([]domain.User, error) {
+	var users []domain.User
+	err := r.db.Where("fcm_token != '' AND fcm_token IS NOT NULL AND deleted_at IS NULL").
+		Limit(limit).Find(&users).Error
+	return users, err
+}
+
 func (r *UserRepo) SoftDelete(id uuid.UUID) error {
 	return r.db.Model(&domain.User{}).
 		Where("id = ? AND deleted_at IS NULL", id).

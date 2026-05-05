@@ -12,7 +12,7 @@
     "mock_api_spec": "tasks/mock-api.yaml"
   },
   "active_agents": {
-    "backend": "agent-backend-8",
+    "backend": "agent-backend-12",
     "frontend": "agent-frontend-3",
     "ops": null
   },
@@ -196,16 +196,16 @@
       "title": "Firebase Storage (фото)",
       "epic": "EPIC-2",
       "agent": "backend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": [
         "TASK-1.1"
       ],
       "agent_instance": "agent-backend-11",
       "started_at": "2026-05-05T00:00:00Z",
-      "done_at": null,
-      "merged_at": null,
+      "done_at": "2026-05-05T00:00:00Z",
+      "merged_at": "2026-05-05T00:00:00Z",
       "branch": "feature/TASK-2.6",
-      "progress_notes": null,
+      "progress_notes": "pkg/storage/client.go: Firebase Storage клієнт (UploadPhoto, DeletePhoto, DeletePhotos). POST /upload/photo (multipart, magic bytes validation, 10MB limit). DeleteMarker тепер видаляє фото з Storage асинхронно.",
       "error": null
     },
     "TASK-2.7": {
@@ -328,17 +328,17 @@
       "title": "TTL Background Worker",
       "epic": "EPIC-4",
       "agent": "backend",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "TASK-2.2",
         "TASK-2.6"
       ],
-      "agent_instance": null,
-      "started_at": null,
+      "agent_instance": "agent-backend-12",
+      "started_at": "2026-05-05T10:00:00Z",
       "done_at": null,
       "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "branch": "feature/TASK-4.5",
+      "progress_notes": "started: goroutine що кожні N хвилин soft-delete markers з expired_at < now(), видаляє фото з Firebase Storage, декрементує marker_count",
       "error": null
     },
     "TASK-5.1": {
@@ -546,17 +546,17 @@
       "title": "Security Audit",
       "epic": "EPIC-6",
       "agent": "backend",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "TASK-1.4",
         "TASK-2.6"
       ],
-      "agent_instance": null,
-      "started_at": null,
+      "agent_instance": "agent-backend-12",
+      "started_at": "2026-05-05T10:00:00Z",
       "done_at": null,
       "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "branch": "feature/TASK-6.4",
+      "progress_notes": "started: аудит JWT валідації, SQL injection, file upload magic bytes, rate limiting, input sanitization, CORS",
       "error": null
     },
     "TASK-6.5": {
@@ -663,16 +663,16 @@
       "title": "FCM: Cleanup невалідних токенів + logout",
       "epic": "EPIC-4",
       "agent": "backend",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "TASK-4.3-A"
       ],
-      "agent_instance": null,
-      "started_at": null,
+      "agent_instance": "agent-backend-12",
+      "started_at": "2026-05-05T10:00:00Z",
       "done_at": null,
       "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "branch": "feature/TASK-4.3-C",
+      "progress_notes": "started: background worker для cleanup невалідних FCM токенів, обробка logout event, scheduled cleanup job",
       "error": null
     },
     "TASK-3.3-A": {

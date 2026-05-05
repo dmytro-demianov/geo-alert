@@ -4,21 +4,26 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	Server    ServerConfig
-	DB        DBConfig
-	Auth      AuthConfig
-	Firebase  FirebaseConfig
-	RateLimit RateLimitConfig
+	Server            ServerConfig
+	DB                DBConfig
+	Auth              AuthConfig
+	Firebase          FirebaseConfig
+	RateLimit         RateLimitConfig
+	TTLWorkerInterval  time.Duration
+	FCMCleanupInterval time.Duration
 }
 
 type ServerConfig struct {
-	Port string
-	Env  string
+	Port               string
+	Env                string
+	CORSAllowedOrigins []string
 }
 
 type DBConfig struct {
@@ -53,6 +58,8 @@ type RateLimitConfig struct {
 func Load() (*Config, error) {
 	_ = godotenv.Load()
 
+	ttlWorkerIntervalMinutes, _ := strconv.Atoi(getEnv("TTL_WORKER_INTERVAL_MINUTES", "5"))
+	fcmCleanupIntervalHours, _ := strconv.Atoi(getEnv("FCM_CLEANUP_INTERVAL_HOURS", "6"))
 	maxConns, _ := strconv.Atoi(getEnv("DB_MAX_CONNECTIONS", "20"))
 	jwtExpiry, _ := strconv.Atoi(getEnv("AUTH_JWT_EXPIRY_HOURS", "24"))
 	markersPerHour, _ := strconv.Atoi(getEnv("RATE_LIMIT_MARKERS_PER_HOUR", "20"))
@@ -60,10 +67,13 @@ func Load() (*Config, error) {
 	commentsPerHour, _ := strconv.Atoi(getEnv("RATE_LIMIT_COMMENTS_PER_HOUR", "50"))
 	globalPerHour, _ := strconv.Atoi(getEnv("RATE_LIMIT_GLOBAL_PER_HOUR", "1000"))
 
+	corsOrigins := strings.Split(getEnv("CORS_ALLOWED_ORIGINS", "http://localhost:5173"), ",")
+
 	cfg := &Config{
 		Server: ServerConfig{
-			Port: getEnv("SERVER_PORT", "8080"),
-			Env:  getEnv("SERVER_ENV", "development"),
+			Port:               getEnv("SERVER_PORT", "8080"),
+			Env:                getEnv("SERVER_ENV", "development"),
+			CORSAllowedOrigins: corsOrigins,
 		},
 		DB: DBConfig{
 			Host:     requireEnv("DB_HOST"),
@@ -90,6 +100,8 @@ func Load() (*Config, error) {
 			CommentsPerHour: commentsPerHour,
 			GlobalPerHour:   globalPerHour,
 		},
+		TTLWorkerInterval:  time.Duration(ttlWorkerIntervalMinutes) * time.Minute,
+		FCMCleanupInterval: time.Duration(fcmCleanupIntervalHours) * time.Hour,
 	}
 
 	return cfg, nil
