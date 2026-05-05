@@ -17,6 +17,7 @@ import (
 	"github.com/dmytro-demianov/geo-alert/pkg/fcm"
 	"github.com/dmytro-demianov/geo-alert/pkg/logger"
 	"github.com/dmytro-demianov/geo-alert/pkg/migrator"
+	"github.com/dmytro-demianov/geo-alert/pkg/storage"
 )
 
 func main() {
@@ -60,11 +61,18 @@ func main() {
 		fcmClient = nil
 	}
 
+	storageClient, err := storage.New(cfg.Firebase.ServiceAccountJSON, cfg.Firebase.StorageBucket)
+	if err != nil {
+		log.Warn().Err(err).Msg("Firebase Storage init failed — photo upload disabled")
+		storageClient = nil
+	}
+
 	notifService := service.NewNotificationService(fcmClient, cooldownRepo, userRepo)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
 	cardHandler := handler.NewCardHandler(cardRepo)
-	markerHandler := handler.NewMarkerHandler(markerRepo, cardRepo)
+	markerHandler := handler.NewMarkerHandler(markerRepo, cardRepo, storageClient)
+	uploadHandler := handler.NewUploadHandler(storageClient)
 	subHandler := handler.NewSubscriptionHandler(subRepo, cardRepo)
 	commentHandler := handler.NewCommentHandler(commentRepo, markerRepo, cardRepo, wsManager)
 	likeHandler := handler.NewLikeHandler(likeRepo, markerRepo, wsManager)
@@ -147,6 +155,7 @@ func main() {
 	r.GET("/ws", authMW, wsHandler.ServeWS)
 	r.GET("/ws/stats", wsHandler.Stats)
 	r.GET("/search", searchHandler.Search)
+	r.POST("/upload/photo", authMW, uploadHandler.UploadPhoto)
 	r.GET("/me/blocked", authMW, blockHandler.ListBlocked)
 
 	users := r.Group("/users")
