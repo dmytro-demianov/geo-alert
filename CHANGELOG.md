@@ -293,3 +293,24 @@ frontend/src/App.tsx                              (обновлён)
 ```
 
 **Ветка:** `feature/TASK-5.4` → merged into `main`
+
+---
+
+### [TASK-2.3] Лайки / Дизлайки
+
+**Микрозадачи:**
+- [x] **2.3.1** `POST /markers/:id/likes` — toggle-эндпоинт: same type=remove, diff type=switch
+- [x] **2.3.2** Атомарный `INSERT ON CONFLICT … DO UPDATE` + пересчёт `like_weight` в одной транзакции
+- [x] **2.3.3** Проверка `allow_likes = true` перед применением действия
+- [x] **2.3.4** (stub) WebSocket broadcast — оставлен TODO в хэндлере для TASK-4.1
+
+**Файлы:**
+```
+backend/internal/domain/like.go          (новый)
+backend/internal/repository/like.go     (новый)
+backend/internal/handler/like.go        (новый)
+backend/cmd/server/main.go              (обновлён: likeRepo, likeHandler, роут POST /markers/:id/likes)
+tasks/BOARD.json                        (TASK-2.3 → merged)
+```
+
+**Ветка:** `feature/TASK-2.3` → merged into `main`

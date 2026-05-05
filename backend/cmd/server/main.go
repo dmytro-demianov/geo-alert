@@ -42,12 +42,14 @@ func main() {
 	markerRepo := repository.NewMarkerRepo(db)
 	subRepo := repository.NewSubscriptionRepo(db)
 	commentRepo := repository.NewCommentRepo(db)
+	likeRepo := repository.NewLikeRepo(db)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
 	cardHandler := handler.NewCardHandler(cardRepo)
 	markerHandler := handler.NewMarkerHandler(markerRepo, cardRepo)
 	subHandler := handler.NewSubscriptionHandler(subRepo, cardRepo)
 	commentHandler := handler.NewCommentHandler(commentRepo, markerRepo, cardRepo)
+	likeHandler := handler.NewLikeHandler(likeRepo, markerRepo)
 	authMW := middleware.AuthRequired(jwtSvc)
 	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
@@ -89,6 +91,7 @@ func main() {
 		markers.GET("/:id", optionalAuthMW, markerHandler.GetMarker)
 		markers.PUT("/:id", authMW, markerHandler.UpdateMarker)
 		markers.DELETE("/:id", authMW, markerHandler.DeleteMarker)
+		markers.POST("/:id/likes", authMW, likeHandler.ToggleLike)
 		markers.GET("/:id/comments", commentHandler.ListComments)
 		markers.POST("/:id/comments", authMW, commentHandler.CreateComment)
 	}
