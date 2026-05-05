@@ -43,6 +43,7 @@ func main() {
 	subRepo := repository.NewSubscriptionRepo(db)
 	commentRepo := repository.NewCommentRepo(db)
 	likeRepo := repository.NewLikeRepo(db)
+	blockRepo := repository.NewBlockRepo(db)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
 	cardHandler := handler.NewCardHandler(cardRepo)
@@ -52,6 +53,7 @@ func main() {
 	likeHandler := handler.NewLikeHandler(likeRepo, markerRepo)
 	viewHandler := handler.NewViewHandler(markerRepo)
 	userHandler := handler.NewUserHandler(userRepo, cardRepo)
+	blockHandler := handler.NewBlockHandler(blockRepo, cardRepo, subRepo)
 	authMW := middleware.AuthRequired(jwtSvc)
 	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
@@ -115,6 +117,16 @@ func main() {
 		subs.DELETE("/:id", authMW, subHandler.Unsubscribe)
 	}
 	r.GET("/me/subscriptions", authMW, subHandler.ListMySubscriptions)
+	r.GET("/me/blocked", authMW, blockHandler.ListBlocked)
+
+	users := r.Group("/users")
+	{
+		users.POST("/:id/block", authMW, blockHandler.BlockUser)
+		users.DELETE("/:id/block", authMW, blockHandler.UnblockUser)
+	}
+
+	cards.POST("/:id/block", authMW, blockHandler.BlockUserOnCard)
+	cards.DELETE("/:id/block", authMW, blockHandler.UnblockUserOnCard)
 
 	addr := ":" + cfg.Server.Port
 	log.Info().Str("addr", addr).Str("env", cfg.Server.Env).Msg("server starting")
