@@ -44,6 +44,7 @@ func main() {
 	commentRepo := repository.NewCommentRepo(db)
 	likeRepo := repository.NewLikeRepo(db)
 	blockRepo := repository.NewBlockRepo(db)
+	feedRepo := repository.NewFeedRepo(db)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
 	cardHandler := handler.NewCardHandler(cardRepo)
@@ -54,6 +55,7 @@ func main() {
 	viewHandler := handler.NewViewHandler(markerRepo)
 	userHandler := handler.NewUserHandler(userRepo, cardRepo, tokenRepo)
 	blockHandler := handler.NewBlockHandler(blockRepo, cardRepo, subRepo)
+	feedHandler := handler.NewFeedHandler(feedRepo)
 	authMW := middleware.AuthRequired(jwtSvc)
 	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
@@ -119,6 +121,7 @@ func main() {
 		subs.DELETE("/:id", authMW, subHandler.Unsubscribe)
 	}
 	r.GET("/me/subscriptions", authMW, subHandler.ListMySubscriptions)
+	r.GET("/feed", authMW, feedHandler.GetFeed)
 	r.GET("/me/blocked", authMW, blockHandler.ListBlocked)
 
 	users := r.Group("/users")
