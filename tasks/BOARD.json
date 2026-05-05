@@ -328,17 +328,17 @@
       "title": "TTL Background Worker",
       "epic": "EPIC-4",
       "agent": "backend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": [
         "TASK-2.2",
         "TASK-2.6"
       ],
       "agent_instance": "agent-backend-12",
       "started_at": "2026-05-05T10:00:00Z",
-      "done_at": null,
-      "merged_at": null,
+      "done_at": "2026-05-05T11:00:00Z",
+      "merged_at": "2026-05-05T11:00:00Z",
       "branch": "feature/TASK-4.5",
-      "progress_notes": "started: goroutine що кожні N хвилин soft-delete markers з expired_at < now(), видаляє фото з Firebase Storage, декрементує marker_count",
+      "progress_notes": "done: internal/worker/ttl_worker.go (TTLWorker.Run+cleanup), MarkerRepo.FindExpired+SoftDeleteExpired, graceful shutdown ctx у main.go, TTL_WORKER_INTERVAL_MINUTES env var",
       "error": null
     },
     "TASK-5.1": {
@@ -546,17 +546,17 @@
       "title": "Security Audit",
       "epic": "EPIC-6",
       "agent": "backend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": [
         "TASK-1.4",
         "TASK-2.6"
       ],
       "agent_instance": "agent-backend-12",
       "started_at": "2026-05-05T10:00:00Z",
-      "done_at": null,
-      "merged_at": null,
-      "branch": "feature/TASK-6.4",
-      "progress_notes": "started: аудит JWT валідації, SQL injection, file upload magic bytes, rate limiting, input sanitization, CORS",
+      "done_at": "2026-05-05T11:00:00Z",
+      "merged_at": "2026-05-05T11:00:00Z",
+      "branch": "feature/TASK-4.5",
+      "progress_notes": "done: SecurityHeaders MW (X-Content-Type-Options/X-Frame-Options/XSS-Protection/Referrer-Policy), CORS MW (allowlist, CORS_ALLOWED_ORIGINS), перевірено: JWT alg check ✓, magic bytes ✓, SQL placeholders ✓, input limits ✓. Known: rate limiting IP-based. SECURITY.md.",
       "error": null
     },
     "TASK-6.5": {
@@ -663,16 +663,16 @@
       "title": "FCM: Cleanup невалідних токенів + logout",
       "epic": "EPIC-4",
       "agent": "backend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": [
         "TASK-4.3-A"
       ],
       "agent_instance": "agent-backend-12",
       "started_at": "2026-05-05T10:00:00Z",
-      "done_at": null,
-      "merged_at": null,
-      "branch": "feature/TASK-4.3-C",
-      "progress_notes": "started: background worker для cleanup невалідних FCM токенів, обробка logout event, scheduled cleanup job",
+      "done_at": "2026-05-05T11:00:00Z",
+      "merged_at": "2026-05-05T11:00:00Z",
+      "branch": "feature/TASK-4.5",
+      "progress_notes": "done: internal/worker/fcm_cleanup_worker.go (FCMCleanupWorker: batch SendToTokens ping 500 токенів, ClearFCMToken для невалідних), UserRepo.FindWithFCMToken, FCM_CLEANUP_INTERVAL_HOURS env var",
       "error": null
     },
     "TASK-3.3-A": {

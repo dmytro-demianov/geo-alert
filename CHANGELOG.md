@@ -826,3 +826,61 @@ frontend/src/api/markers.ts                     (додано getMarker alias)
 ```
 
 **Гілка:** `feature/TASK-5.8` → merged into `main`
+
+---
+
+### [TASK-4.5] TTL Background Worker
+
+**Мікрозадачі:**
+- [x] `internal/worker/ttl_worker.go` — TTLWorker: Run(ctx) + cleanup(): FindExpired(100) → DeletePhotos → SoftDeleteExpired → DecrementMarkerCount, zerolog
+- [x] `internal/repository/marker.go` — додані FindExpired(limit) та SoftDeleteExpired(ids []uuid.UUID)
+- [x] `internal/config/config.go` — TTLWorkerInterval (TTL_WORKER_INTERVAL_MINUTES env, default 5)
+- [x] `cmd/server/main.go` — signal.NotifyContext для graceful shutdown + go ttlWorker.Run(ctx)
+
+**Файли:**
+```
+backend/internal/worker/ttl_worker.go       (новий)
+backend/internal/repository/marker.go       (додані методи)
+backend/internal/config/config.go           (нові поля)
+backend/cmd/server/main.go                  (graceful shutdown + worker wire)
+```
+
+**Гілка:** `feature/TASK-4.5` → merged into `main`
+
+---
+
+### [TASK-4.3-C] FCM: Cleanup невалідних токенів
+
+**Мікрозадачі:**
+- [x] `internal/worker/fcm_cleanup_worker.go` — FCMCleanupWorker: batch SendToTokens ping (500 токенів), ClearFCMToken для невалідних
+- [x] `internal/repository/user.go` — додано FindWithFCMToken(limit)
+- [x] `internal/config/config.go` — FCMCleanupInterval (FCM_CLEANUP_INTERVAL_HOURS env, default 6)
+- [x] `cmd/server/main.go` — go fcmCleanup.Run(ctx)
+
+**Файли:**
+```
+backend/internal/worker/fcm_cleanup_worker.go  (новий)
+backend/internal/repository/user.go            (додано FindWithFCMToken)
+```
+
+**Гілка:** `feature/TASK-4.5` → merged into `main`
+
+---
+
+### [TASK-6.4] Security Audit
+
+**Мікрозадачі:**
+- [x] `internal/middleware/security_headers.go` — X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy
+- [x] `internal/middleware/cors.go` — allowlist-based CORS (CORS_ALLOWED_ORIGINS env), Vary: Origin, OPTIONS preflight
+- [x] `internal/config/config.go` — CORSAllowedOrigins []string
+- [x] `cmd/server/main.go` — r.Use(SecurityHeaders()) + r.Use(CORS(...))
+- [x] `SECURITY.md` — аудит: JWT alg check ✓, magic bytes ✓, SQL placeholders ✓, input limits ✓. Known limitation: rate limiting IP-based only.
+
+**Файли:**
+```
+backend/internal/middleware/security_headers.go  (новий)
+backend/internal/middleware/cors.go              (новий)
+backend/SECURITY.md                              (новий)
+```
+
+**Гілка:** `feature/TASK-4.5` → merged into `main`
