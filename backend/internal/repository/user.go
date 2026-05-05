@@ -36,3 +36,23 @@ func (r *UserRepo) FindByID(id uuid.UUID) (*domain.User, error) {
 func (r *UserRepo) Upsert(user *domain.User) error {
 	return r.db.Save(user).Error
 }
+
+func (r *UserRepo) UpdateProfile(id uuid.UUID, displayName, bio, avatarURL string) error {
+	return r.db.Model(&domain.User{}).
+		Where("id = ? AND deleted_at IS NULL", id).
+		Updates(map[string]interface{}{
+			"display_name": displayName,
+			"bio":          bio,
+			"avatar_url":   avatarURL,
+			"updated_at":   gorm.Expr("NOW()"),
+		}).Error
+}
+
+func (r *UserRepo) SoftDelete(id uuid.UUID) error {
+	return r.db.Model(&domain.User{}).
+		Where("id = ? AND deleted_at IS NULL", id).
+		Updates(map[string]interface{}{
+			"deleted_at": gorm.Expr("NOW()"),
+			"fcm_token":  "",
+		}).Error
+}

@@ -68,6 +68,12 @@ func (r *CardRepo) Delete(id uuid.UUID, ownerID uuid.UUID) error {
 		Update("deleted_at", now).Error
 }
 
+func (r *CardRepo) SoftDeleteByOwner(ownerID uuid.UUID) error {
+	return r.db.Model(&domain.Card{}).
+		Where("owner_id = ? AND deleted_at IS NULL", ownerID).
+		Update("deleted_at", gorm.Expr("NOW()")).Error
+}
+
 func (r *CardRepo) CountPublicByOwner(ownerID uuid.UUID) (int64, error) {
 	var count int64
 	err := r.db.Model(&domain.Card{}).
