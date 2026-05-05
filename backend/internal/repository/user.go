@@ -48,6 +48,24 @@ func (r *UserRepo) UpdateProfile(id uuid.UUID, displayName, bio, avatarURL strin
 		}).Error
 }
 
+func (r *UserRepo) UpdateFCMToken(id uuid.UUID, token string) error {
+	return r.db.Model(&domain.User{}).
+		Where("id = ? AND deleted_at IS NULL", id).
+		Update("fcm_token", token).Error
+}
+
+func (r *UserRepo) ClearFCMToken(id uuid.UUID) error {
+	return r.db.Model(&domain.User{}).
+		Where("id = ?", id).
+		Update("fcm_token", "").Error
+}
+
+func (r *UserRepo) FindByFCMToken(token string) ([]domain.User, error) {
+	var users []domain.User
+	err := r.db.Where("fcm_token = ? AND deleted_at IS NULL", token).Find(&users).Error
+	return users, err
+}
+
 func (r *UserRepo) SoftDelete(id uuid.UUID) error {
 	return r.db.Model(&domain.User{}).
 		Where("id = ? AND deleted_at IS NULL", id).

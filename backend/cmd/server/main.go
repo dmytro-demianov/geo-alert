@@ -13,6 +13,7 @@ import (
 	"github.com/dmytro-demianov/geo-alert/internal/middleware"
 	"github.com/dmytro-demianov/geo-alert/internal/repository"
 	"github.com/dmytro-demianov/geo-alert/internal/ws"
+	"github.com/dmytro-demianov/geo-alert/pkg/fcm"
 	"github.com/dmytro-demianov/geo-alert/pkg/logger"
 	"github.com/dmytro-demianov/geo-alert/pkg/migrator"
 )
@@ -61,6 +62,13 @@ func main() {
 	searchHandler := handler.NewSearchHandler(searchRepo)
 	wsManager := ws.NewManager()
 	wsHandler := handler.NewWSHandler(wsManager)
+
+	fcmClient, err := fcm.New(cfg.Firebase.ServiceAccountJSON)
+	if err != nil {
+		log.Warn().Err(err).Msg("FCM init failed — push notifications disabled")
+		fcmClient = nil
+	}
+	_ = fcmClient // used by future TASK-4.3-B
 	authMW := middleware.AuthRequired(jwtSvc)
 	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
@@ -84,7 +92,7 @@ func main() {
 	{
 		authGroup.POST("/google", authHandler.GoogleAuth)
 		authGroup.POST("/refresh", authHandler.Refresh)
-		authGroup.POST("/logout", authHandler.Logout)
+		authGroup.POST("/logout", optionalAuthMW, authHandler.Logout)
 		authGroup.GET("/me", authMW, authHandler.Me)
 	}
 
@@ -99,6 +107,7 @@ func main() {
 	r.GET("/users/:id", userHandler.GetUser)
 	r.PUT("/users/me", authMW, userHandler.UpdateMe)
 	r.DELETE("/users/me", authMW, userHandler.DeleteMe)
+	r.POST("/users/me/fcm-token", authMW, userHandler.SaveFCMToken)
 	r.GET("/users/:id/cards", optionalAuthMW, cardHandler.ListByOwner)
 
 	markers := r.Group("/markers")
