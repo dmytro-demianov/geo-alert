@@ -12,6 +12,7 @@ import (
 	"github.com/dmytro-demianov/geo-alert/internal/handler"
 	"github.com/dmytro-demianov/geo-alert/internal/middleware"
 	"github.com/dmytro-demianov/geo-alert/internal/repository"
+	"github.com/dmytro-demianov/geo-alert/internal/service"
 	"github.com/dmytro-demianov/geo-alert/internal/ws"
 	"github.com/dmytro-demianov/geo-alert/pkg/fcm"
 	"github.com/dmytro-demianov/geo-alert/pkg/logger"
@@ -48,8 +49,18 @@ func main() {
 	blockRepo := repository.NewBlockRepo(db)
 	feedRepo := repository.NewFeedRepo(db)
 	searchRepo := repository.NewSearchRepo(db)
+	locationRepo := repository.NewLocationRepo(db)
+	cooldownRepo := repository.NewCooldownRepo(db)
 
 	wsManager := ws.NewManager()
+
+	fcmClient, err := fcm.New(cfg.Firebase.ServiceAccountJSON)
+	if err != nil {
+		log.Warn().Err(err).Msg("FCM init failed — push notifications disabled")
+		fcmClient = nil
+	}
+
+	notifService := service.NewNotificationService(fcmClient, cooldownRepo, userRepo)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
 	cardHandler := handler.NewCardHandler(cardRepo)
@@ -63,13 +74,7 @@ func main() {
 	feedHandler := handler.NewFeedHandler(feedRepo)
 	searchHandler := handler.NewSearchHandler(searchRepo)
 	wsHandler := handler.NewWSHandler(wsManager)
-
-	fcmClient, err := fcm.New(cfg.Firebase.ServiceAccountJSON)
-	if err != nil {
-		log.Warn().Err(err).Msg("FCM init failed — push notifications disabled")
-		fcmClient = nil
-	}
-	_ = fcmClient // used by future TASK-4.3-B
+	locationHandler := handler.NewLocationHandler(locationRepo, userRepo, notifService)
 	authMW := middleware.AuthRequired(jwtSvc)
 	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
@@ -137,6 +142,8 @@ func main() {
 	}
 	r.GET("/me/subscriptions", authMW, subHandler.ListMySubscriptions)
 	r.GET("/feed", authMW, feedHandler.GetFeed)
+	r.GET("/feed/nearby", optionalAuthMW, locationHandler.GetNearbyFeed)
+	r.POST("/users/me/location", authMW, locationHandler.UpdateLocation)
 	r.GET("/ws", authMW, wsHandler.ServeWS)
 	r.GET("/ws/stats", wsHandler.Stats)
 	r.GET("/search", searchHandler.Search)

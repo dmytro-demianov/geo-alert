@@ -12,6 +12,7 @@ type Card struct {
 	Title           string     `gorm:"not null"`
 	Description     string
 	IsPublic        bool       `gorm:"default:true"`
+	Radius          int        `gorm:"default:200"`
 	TTLHours        int        `gorm:"default:0"`
 	ViewCount       int64      `gorm:"default:0"`
 	MarkerCount     int        `gorm:"default:0"`
