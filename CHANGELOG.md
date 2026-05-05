@@ -658,3 +658,30 @@ backend/cmd/server/main.go      (GET /ws/stats)
 ```
 
 **Ветка:** `feature/TASK-4.1-C` → merged into `main`
+
+---
+
+### [TASK-5.7] Социальные функции UI
+
+**Микрозадачи:**
+- [x] **5.7.1** Страница профиля `/users/:id` — аватар (round + fallback з ініціалами), display_name, bio, лічильники карт/підписників, список публічних карт користувача
+- [x] **5.7.2** Кнопки Підписатися / Відписатися / Заблокувати на чужому профілі; subscribe через `POST /subscriptions`, unsubscribe через `DELETE /subscriptions/:id`, block через `POST /users/:id/block`
+- [x] **5.7.3** Модальне вікно блокування (`BlockModal`) з radio-кнопками "Заблокувати карту" / "Заблокувати користувача" та підтвердженням
+- [x] **5.7.4** Сторінка налаштувань `/settings/blocked` — список заблокованих юзерів і карт (GET /me/blocked), кнопка "Розблокувати" для кожного
+- [x] Новий API-модуль `usersApi` + `subscriptionsApi` у `frontend/src/api/users.ts`
+- [x] Zustand-стор `useSocialStore` у `frontend/src/store/social.ts`
+- [x] Навігація в `TopBar`: пункти "Профіль" → `/users/:id`, "Заблоковані" → `/settings/blocked`
+- [x] Нові захищені роути в `App.tsx`
+
+**Файлы:**
+```
+frontend/src/api/users.ts                      (usersApi + subscriptionsApi — новий файл)
+frontend/src/store/social.ts                   (useSocialStore — новий файл)
+frontend/src/components/Social/BlockModal.tsx  (новий компонент)
+frontend/src/pages/UserProfilePage.tsx         (новий маршрут /users/:id)
+frontend/src/pages/BlockedSettingsPage.tsx     (новий маршрут /settings/blocked)
+frontend/src/App.tsx                           (додані роути)
+frontend/src/components/TopBar.tsx             (навігація в UserButton)
+```
+
+**Ветка:** `feature/TASK-5.7` → merged into `main`
