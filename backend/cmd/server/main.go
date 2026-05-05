@@ -39,10 +39,13 @@ func main() {
 	userRepo := repository.NewUserRepo(db)
 	tokenRepo := repository.NewRefreshTokenRepo(db)
 	cardRepo := repository.NewCardRepo(db)
+	markerRepo := repository.NewMarkerRepo(db)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
 	cardHandler := handler.NewCardHandler(cardRepo)
+	markerHandler := handler.NewMarkerHandler(markerRepo, cardRepo)
 	authMW := middleware.AuthRequired(jwtSvc)
+	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
 	if cfg.Server.Env == "production" {
 		gin.SetMode(gin.ReleaseMode)
@@ -75,7 +78,20 @@ func main() {
 		cards.PUT("/:id", authMW, cardHandler.UpdateCard)
 		cards.DELETE("/:id", authMW, cardHandler.DeleteCard)
 	}
-	r.GET("/users/:id/cards", cardHandler.ListByOwner)
+	r.GET("/users/:id/cards", optionalAuthMW, cardHandler.ListByOwner)
+
+	markers := r.Group("/markers")
+	{
+		markers.GET("/:id", optionalAuthMW, markerHandler.GetMarker)
+		markers.PUT("/:id", authMW, markerHandler.UpdateMarker)
+		markers.DELETE("/:id", authMW, markerHandler.DeleteMarker)
+	}
+
+	cardMarkers := r.Group("/cards/:id/markers")
+	{
+		cardMarkers.GET("", optionalAuthMW, markerHandler.ListMarkers)
+		cardMarkers.POST("", authMW, markerHandler.CreateMarker)
+	}
 
 	addr := ":" + cfg.Server.Port
 	log.Info().Str("addr", addr).Str("env", cfg.Server.Env).Msg("server starting")
