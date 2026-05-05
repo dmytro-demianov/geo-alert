@@ -13,7 +13,7 @@
   },
   "active_agents": {
     "backend": "agent-backend-12",
-    "frontend": "agent-frontend-3",
+    "frontend": "agent-frontend-7",
     "ops": null
   },
   "tasks": {
@@ -741,48 +741,48 @@
       "title": "Деталі метки: лайк/дизлайк + real-time лічильник",
       "epic": "EPIC-5",
       "agent": "frontend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-5.6-A"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-frontend-7",
+      "started_at": "2026-05-05T12:00:00Z",
+      "done_at": "2026-05-05T13:00:00Z",
+      "merged_at": "2026-05-05T13:00:00Z",
+      "branch": "feature/TASK-5.6-BCD",
+      "progress_notes": "done: Like/Dislike кнопки (optimistic+rollback), WS like_update real-time, localWeight state, heatColor, markersApi.toggleLike",
       "error": null
     },
     "TASK-5.6-C": {
       "title": "Деталі метки: коментарі + @mention autocomplete",
       "epic": "EPIC-5",
       "agent": "frontend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-5.6-A"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-frontend-7",
+      "started_at": "2026-05-05T12:00:00Z",
+      "done_at": "2026-05-05T13:00:00Z",
+      "merged_at": "2026-05-05T13:00:00Z",
+      "branch": "feature/TASK-5.6-BCD",
+      "progress_notes": "done: CommentsSection (cursor pagination, WS new_comment, @mention autocomplete /search, allow_comments guard, localCommentCount sync), getComments/createComment/deleteComment API",
       "error": null
     },
     "TASK-5.6-D": {
       "title": "Деталі метки: кнопка 'Поскаржитись'",
       "epic": "EPIC-5",
       "agent": "frontend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-5.6-A"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-frontend-7",
+      "started_at": "2026-05-05T12:00:00Z",
+      "done_at": "2026-05-05T13:00:00Z",
+      "merged_at": "2026-05-05T13:00:00Z",
+      "branch": "feature/TASK-5.6-BCD",
+      "progress_notes": "done: ReportModal (radio reason select, optional comment, success/error state), !isOwner guard, reportMarker API",
       "error": null
     },
     "TASK-6.2-A": {

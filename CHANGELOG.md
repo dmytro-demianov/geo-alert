@@ -884,3 +884,65 @@ backend/SECURITY.md                              (новий)
 ```
 
 **Гілка:** `feature/TASK-4.5` → merged into `main`
+
+---
+
+### [TASK-5.6-B] Деталі метки: лайк/дизлайк + real-time лічильник
+
+**Мікрозадачі:**
+- [x] LikeBar у MarkerDetailDrawer: кнопки LIKE (brand-500) / DISLIKE (slate-700) з `rounded-full`
+- [x] Оптимістичний UI з rollback при помилці API
+- [x] Real-time `like_weight` через `wsClient.on('like_update', ...)` → `setLocalWeight`
+- [x] `like_weight` прибрано зі stats row, залишені `comment_count` та `view_count`
+- [x] `markersApi.toggleLike(markerId, type)` → POST /markers/:id/likes
+- [x] `LikeType`, `LikeResponse` інтерфейси в api/markers.ts
+
+**Файли:**
+```
+frontend/src/components/MarkerDetailDrawer.tsx  (LikeBar, WS підписка)
+frontend/src/api/markers.ts                     (LikeType, LikeResponse, toggleLike)
+```
+
+**Гілка:** `feature/TASK-5.6-BCD` → merged into `main`
+
+---
+
+### [TASK-5.6-C] Деталі метки: коментарі + @mention autocomplete
+
+**Мікрозадачі:**
+- [x] `CommentsSection` компонент: завантаження 20 коментарів при відкритті, cursor pagination "Показати ще"
+- [x] Real-time нові коментарі через `wsClient.on('new_comment', ...)` → prepend до списку
+- [x] @mention autocomplete: `/@(\w*)$/` detection → GET /search?type=users&q=... → dropdown → вставка `@display_name`
+- [x] Enter (без Shift) надсилає коментар якщо suggestions закриті
+- [x] `allow_comments === false` → "Коментарі вимкнені" замість форми
+- [x] Avatar: перша літера author_name у `bg-brand-100 text-brand-700` кружку
+- [x] `localCommentCount` в MarkerDetailDrawer синхронізується через `onCountChange`
+- [x] `Comment`, `CommentsResponse`, `getComments`, `createComment`, `deleteComment` в api/markers.ts
+
+**Файли:**
+```
+frontend/src/components/MarkerDetailDrawer.tsx  (CommentsSection, @mention, WS)
+frontend/src/api/markers.ts                     (Comment, CommentsResponse, методи)
+```
+
+**Гілка:** `feature/TASK-5.6-BCD` → merged into `main`
+
+---
+
+### [TASK-5.6-D] Деталі метки: кнопка 'Поскаржитись'
+
+**Мікрозадачі:**
+- [x] `ReportModal` компонент у MarkerDetailDrawer.tsx: backdrop + centered modal (z-[201])
+- [x] Radio-вибір причини: spam / inappropriate / misinformation / copyright / other (styled brand-50/brand-300)
+- [x] Optional textarea коментар (max 500 chars)
+- [x] loading / error / success стани (success: зелена галочка + дяку)
+- [x] Кнопка "Поскаржитись" тільки для `!isOwner`, розміщена під metadata
+- [x] `ReportReason`, `reportMarker` в api/markers.ts → POST /markers/:id/reports
+
+**Файли:**
+```
+frontend/src/components/MarkerDetailDrawer.tsx  (ReportModal, report button)
+frontend/src/api/markers.ts                     (ReportReason, reportMarker)
+```
+
+**Гілка:** `feature/TASK-5.6-BCD` → merged into `main`
