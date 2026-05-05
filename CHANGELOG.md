@@ -440,3 +440,49 @@ tasks/BOARD.json                          (TASK-1.5 → merged)
 ```
 
 **Гілка:** `feature/TASK-1.5` → merged into `main`
+
+---
+
+## Сессия 3 — 2026-05-05 · агент: backend-3
+
+---
+
+### [TASK-3.3-A] Профили: GET /users/:id
+
+**Микрозадачи:**
+- [x] **3.3.1** `GET /users/:id` — возвращает профиль: `display_name`, `avatar_url`, `bio`, `is_private`, `card_count`, `created_at`
+- [x] Удалённый пользователь → заглушка `{id, display_name: "Удалённый пользователь", deleted: true}`
+- [x] `CardRepo.CountPublicByOwner` — подсчёт публичных карт пользователя
+
+**Файлы:**
+```
+backend/internal/handler/user.go        (новый — UserHandler.GetUser)
+backend/internal/repository/card.go     (добавлен CountPublicByOwner)
+backend/cmd/server/main.go              (userHandler + роут GET /users/:id)
+```
+
+**Ветка:** `feature/TASK-3.3-A` → merged into `main`
+
+---
+
+### [TASK-3.2] Блокировка пользователей
+
+**Микрозадачи:**
+- [x] **3.2.1** `POST /users/:id/block` — USER_BLOCK + удаление взаимных подписок
+- [x] **3.2.2** `POST /cards/:id/block` — CARD_BLOCK (только owner карты) + удаление подписки заблокированного
+- [x] **3.2.3** `DELETE /users/:id/block` — разблокировать пользователя
+- [x] **3.2.4** `DELETE /cards/:id/block` — разблокировать всех на карте
+- [x] **3.2.5** `GET /me/blocked` — список всех блоков текущего пользователя
+- [x] **3.2.6** `BlockCheck` middleware — проверяет `owner_id` из контекста, отдаёт 403 если заблокирован
+- [x] `FindByFingerprint` — для auto-block при повторном логине (TASK-3.2.7, привязка к auth flow)
+
+**Файлы:**
+```
+backend/internal/domain/block.go           (новый — Block struct, BlockType enum)
+backend/internal/repository/block.go       (новый — CRUD + IsBlocked + FindByFingerprint)
+backend/internal/handler/block.go          (новый — BlockUser/CardBlock/Unblock/ListBlocked)
+backend/internal/middleware/block_check.go (новый — BlockCheck middleware)
+backend/cmd/server/main.go                 (blockRepo, blockHandler, 5 новых роутов)
+```
+
+**Ветка:** `feature/TASK-3.2` → merged into `main`
