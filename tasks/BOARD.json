@@ -598,32 +598,32 @@
       "title": "WebSocket: Broadcast лайків та коментарів",
       "epic": "EPIC-4",
       "agent": "backend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-4.1-A"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-backend-7",
+      "started_at": "2026-05-05T23:00:00Z",
+      "done_at": "2026-05-05T23:30:00Z",
+      "merged_at": "2026-05-05T23:30:00Z",
+      "branch": "feature/TASK-4.1-B",
+      "progress_notes": "done: likeHandler.broadcastLikeUpdate → Manager.Broadcast {type:like_update,marker_id,like_weight} на всех путях ToggleLike; commentHandler → Broadcast {type:new_comment,marker_id,comment} после CreateComment",
       "error": null
     },
     "TASK-4.1-C": {
       "title": "WebSocket: Heartbeat + ping-pong",
       "epic": "EPIC-4",
       "agent": "backend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-4.1-A"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-backend-7",
+      "started_at": "2026-05-05T23:00:00Z",
+      "done_at": "2026-05-05T23:45:00Z",
+      "merged_at": "2026-05-05T23:45:00Z",
+      "branch": "feature/TASK-4.1-C",
+      "progress_notes": "done: ping-pong реализован в TASK-4.1-A (writePump ping 45s, readPump pong deadline 60s); добавлены ConnectedCount/ConnectedUsers на Manager; GET /ws/stats",
       "error": null
     },
     "TASK-4.3-A": {

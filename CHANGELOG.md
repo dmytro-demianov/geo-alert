@@ -617,3 +617,44 @@ backend/cmd/server/main.go          (fcm.New, POST /users/me/fcm-token)
 ```
 
 **Ветка:** `feature/TASK-4.3-A` → merged into `main`
+
+---
+
+## Сессия 6 — 2026-05-05 · агент: backend-7
+
+---
+
+### [TASK-4.1-B] WebSocket: Broadcast лайков и комментариев
+
+**Микрозадачи:**
+- [x] **4.1.3** Broadcast при лайке: `{"type":"like_update","marker_id":"...","like_weight":N}` — все три пути ToggleLike (remove / create / switch)
+- [x] **4.1.4** Broadcast при новом комментарии: `{"type":"new_comment","marker_id":"...","comment":{...}}`
+- [x] `wsManager` инициализируется первым в main.go, передаётся в `likeHandler` и `commentHandler`
+
+**Файлы:**
+```
+backend/internal/handler/like.go    (wsHub + broadcastLikeUpdate)
+backend/internal/handler/comment.go (wsHub + Broadcast после CreateComment)
+backend/cmd/server/main.go          (порядок инициализации)
+```
+
+**Ветка:** `feature/TASK-4.1-B` → merged into `main`
+
+---
+
+### [TASK-4.1-C] WebSocket: Heartbeat + ping-pong
+
+**Микрозадачи:**
+- [x] **4.1.5** Ping-pong реализован в TASK-4.1-A: `writePump` пингует каждые 45s, `readPump` сбрасывает `SetReadDeadline` при pong (60s таймаут)
+- [x] `Manager.ConnectedCount()` — суммарное число соединений
+- [x] `Manager.ConnectedUsers()` — число уникальных подключённых пользователей
+- [x] `GET /ws/stats` — публичный эндпоинт мониторинга `{connections, connected_users}`
+
+**Файлы:**
+```
+backend/internal/ws/manager.go  (ConnectedCount + ConnectedUsers)
+backend/internal/handler/ws.go  (Stats handler)
+backend/cmd/server/main.go      (GET /ws/stats)
+```
+
+**Ветка:** `feature/TASK-4.1-C` → merged into `main`
