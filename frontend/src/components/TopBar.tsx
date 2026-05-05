@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Icon from './ui/Icon'
 import Avatar from './ui/Avatar'
 import { useAuthStore } from '@/store/auth'
+import { logoutRequest } from '@/api/auth'
 
 interface TopBarProps {
   onMenuToggle: () => void
@@ -135,6 +137,7 @@ function NotificationsButton() {
 function UserButton({ onLogin }: { onLogin: () => void }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
   const { user, isAuthenticated, logout } = useAuthStore()
 
   useEffect(() => {
@@ -158,11 +161,11 @@ function UserButton({ onLogin }: { onLogin: () => void }) {
 
   const displayName = user?.display_name ?? 'Користувач'
 
-  const items = [
-    { label: 'Профіль', icon: 'user' },
-    { label: 'Мої позначки', icon: 'map-pin' },
-    { label: 'Підписки', icon: 'heart' },
-    { label: 'Налаштування', icon: 'settings' },
+  const items: { label: string; icon: string; path: string }[] = [
+    { label: 'Профіль', icon: 'user', path: user ? `/users/${user.id}` : '/' },
+    { label: 'Мої позначки', icon: 'map-pin', path: '/my-cards' },
+    { label: 'Підписки', icon: 'heart', path: '/' },
+    { label: 'Заблоковані', icon: 'alert-circle', path: '/settings/blocked' },
   ]
 
   return (
@@ -184,15 +187,28 @@ function UserButton({ onLogin }: { onLogin: () => void }) {
             </div>
           </div>
           <div className="p-1">
-            {items.map(({ label, icon }) => (
-              <button key={label} className="w-full flex items-center gap-2.5 px-2.5 py-2 text-[13px] text-slate-900 hover:bg-slate-50 rounded-md transition-colors text-left">
+            {items.map(({ label, icon, path }) => (
+              <button
+                key={label}
+                onClick={() => { setOpen(false); navigate(path) }}
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 text-[13px] text-slate-900 hover:bg-slate-50 rounded-md transition-colors text-left"
+              >
                 <Icon name={icon} size={14} stroke="#64748B" />
                 {label}
               </button>
             ))}
           </div>
           <div className="p-1 border-t border-slate-100">
-            <button onClick={logout} className="w-full flex items-center gap-2.5 px-2.5 py-2 text-[13px] text-red-700 hover:bg-red-50 rounded-md transition-colors text-left">
+            <button
+              onClick={() => {
+                setOpen(false)
+                logoutRequest().catch(() => {}).finally(() => {
+                  logout()
+                  navigate('/login', { replace: true })
+                })
+              }}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 text-[13px] text-red-700 hover:bg-red-50 rounded-md transition-colors text-left"
+            >
               <Icon name="log-out" size={14} stroke="#B91C1C" />
               Вийти
             </button>
@@ -205,6 +221,7 @@ function UserButton({ onLogin }: { onLogin: () => void }) {
 
 export default function TopBar({ onMenuToggle, onCreateCard }: TopBarProps) {
   const { isAuthenticated } = useAuthStore()
+  const navigate = useNavigate()
 
   return (
     <div className="absolute top-3 left-3 right-3 h-14 z-[150] px-3 flex items-center gap-2.5 bg-white/95 backdrop-blur-md border border-slate-900/[0.06] rounded-lg shadow-md">
@@ -238,7 +255,7 @@ export default function TopBar({ onMenuToggle, onCreateCard }: TopBarProps) {
       )}
 
       <NotificationsButton />
-      <UserButton onLogin={() => {}} />
+      <UserButton onLogin={() => navigate('/login')} />
     </div>
   )
 }
