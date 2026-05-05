@@ -776,3 +776,29 @@ backend/internal/repository/db.go                 (оновлено — connecti
 ```
 
 **Гілка:** `feature/TASK-6.3` → merged into `main`
+
+---
+
+## Сессия 8 — 2026-05-05 · агент: frontend-5
+
+---
+
+### [TASK-5.8] Лента активності UI
+
+**Мікрозадачі:**
+- [x] **5.8.1** `api/feed.ts` — `feedApi.getFeed(params)` з cursor-пагінацією (limit/before/before_id), типи `FeedItem`, `FeedMarker`, `FeedCard`, `FeedActor`, `FeedResponse`
+- [x] **5.8.2** `pages/FeedPage.tsx` — сторінка `/feed` (ProtectedRoute): infinite scroll через `IntersectionObserver` (rootMargin 200px), skeleton-loader (3 анімовані картки), spinner при підвантаженні, повідомлення "Нових записів немає" при вичерпанні даних, обробка помилок з кнопкою повтору
+- [x] **5.8.3** `FeedCard` компонент (вбудований у FeedPage): превью фото або placeholder з Icon "image", heat-badge з heatColor(like_weight), title + description (line-clamp), теги (pill-badges, макс 4 + overflow), джерело карти з іконкою layers, Actor (Avatar + display_name) + relative time (timeAgo helper), лічильники heart + message
+- [x] **5.8.4** Клік по карточці → навігація на `/cards/:card_id`
+- [x] Роут `/feed` додано в `App.tsx` (ProtectedRoute)
+- [x] Посилання "Стрічка активності" додано в `TopBar.tsx` (UserButton dropdown)
+
+**Файли:**
+```
+frontend/src/api/feed.ts           (новий)
+frontend/src/pages/FeedPage.tsx    (новий)
+frontend/src/App.tsx               (додано роут /feed + імпорт FeedPage)
+frontend/src/components/TopBar.tsx (додано пункт меню Стрічка активності)
+```
+
+**Гілка:** `feature/TASK-5.8` → merged into `main`
