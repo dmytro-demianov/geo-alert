@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,15 +14,17 @@ import (
 
 	"github.com/dmytro-demianov/geo-alert/internal/domain"
 	"github.com/dmytro-demianov/geo-alert/internal/repository"
+	"github.com/dmytro-demianov/geo-alert/pkg/storage"
 )
 
 type MarkerHandler struct {
 	markers *repository.MarkerRepo
 	cards   *repository.CardRepo
+	storage *storage.Client
 }
 
-func NewMarkerHandler(markers *repository.MarkerRepo, cards *repository.CardRepo) *MarkerHandler {
-	return &MarkerHandler{markers: markers, cards: cards}
+func NewMarkerHandler(markers *repository.MarkerRepo, cards *repository.CardRepo, storageClient *storage.Client) *MarkerHandler {
+	return &MarkerHandler{markers: markers, cards: cards, storage: storageClient}
 }
 
 type createMarkerRequest struct {
@@ -437,6 +440,11 @@ func (h *MarkerHandler) DeleteMarker(c *gin.Context) {
 
 	if !marker.IsDraft {
 		_ = h.markers.DecrementMarkerCount(marker.CardID)
+	}
+
+	// Asynchronously delete associated photos from storage.
+	if h.storage != nil && len(marker.Images) > 0 {
+		go h.storage.DeletePhotos(context.Background(), marker.Images)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"ok": true})

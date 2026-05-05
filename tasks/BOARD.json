@@ -196,15 +196,15 @@
       "title": "Firebase Storage (фото)",
       "epic": "EPIC-2",
       "agent": "backend",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": [
         "TASK-1.1"
       ],
-      "agent_instance": null,
-      "started_at": null,
+      "agent_instance": "agent-backend-11",
+      "started_at": "2026-05-05T00:00:00Z",
       "done_at": null,
       "merged_at": null,
-      "branch": null,
+      "branch": "feature/TASK-2.6",
       "progress_notes": null,
       "error": null
     },
@@ -725,16 +725,16 @@
       "title": "Деталі метки: галерея фото + теги + view_count",
       "epic": "EPIC-5",
       "agent": "frontend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-5.11"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-frontend-6",
+      "started_at": "2026-05-05T00:00:00Z",
+      "done_at": "2026-05-05T00:00:00Z",
+      "merged_at": "2026-05-05T00:00:00Z",
+      "branch": "feature/TASK-5.6-A",
+      "progress_notes": "done: MarkerDetailDrawer component (photo gallery with prev/next + counter, tags as pill badges, view_count visible to owner only, TTL badge with countdown, time-ago + coords metadata); integrated into CardPage sidebar list clicks and map marker clicks; added getMarker() alias to markersApi",
       "error": null
     },
     "TASK-5.6-B": {

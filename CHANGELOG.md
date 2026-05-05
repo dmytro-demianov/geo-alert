@@ -801,4 +801,28 @@ frontend/src/App.tsx               (додано роут /feed + імпорт F
 frontend/src/components/TopBar.tsx (додано пункт меню Стрічка активності)
 ```
 
+---
+
+### [TASK-5.6-A] Деталі метки: галерея фото + теги + view_count
+
+**Мікрозадачі:**
+- [x] **5.6-A.1** `components/MarkerDetailDrawer.tsx` — новий компонент: боковий drawer справа (420px) на десктопі, bottom sheet на мобайлі (max-h-90vh + rounded-t-2xl); бекдроп для мобайлу з onClose; анімації slideRight/slideUp
+- [x] **5.6-A.2** `PhotoGallery` — горизонтальний слайдер: prev/next кнопки, лічильник "1 / N", індикатори-точки, заглушка з Icon "image" + текст "Нет фото" якщо photos порожній
+- [x] **5.6-A.3** Кнопка закрити (X) в правому верхньому куті поверх галереї
+- [x] **5.6-A.4** Заголовок (h2, 20px/bold) + badge "Чернетка" якщо is_draft
+- [x] **5.6-A.5** Опис (whitespace-pre-wrap, 14px)
+- [x] **5.6-A.6** Теги — pill badges (bg-brand-50 / text-brand-700) з `#` префіксом
+- [x] **5.6-A.7** Stats row: like_weight (heatColor), comment_count, view_count (тільки якщо isOwner === true) з іконкою eye
+- [x] **5.6-A.8** TTL badge з useTtlCountdown: normal/critical (animate-pulse)/expired стани
+- [x] **5.6-A.9** Metadata: time-ago (timeAgo helper) + координати до 5 знаків після коми (font-mono)
+- [x] **5.6-A.10** Інтеграція в `CardPage.tsx`: стан `drawerMarker`, відкривається при кліку на маркер у sidebar та на пін карти (eventHandlers.click)
+- [x] **5.6-A.11** `api/markers.ts` — додано `getMarker(id)` alias (аліас для getById)
+
+**Файли:**
+```
+frontend/src/components/MarkerDetailDrawer.tsx  (новий)
+frontend/src/pages/CardPage.tsx                 (додано імпорт + drawerMarker state + інтеграція)
+frontend/src/api/markers.ts                     (додано getMarker alias)
+```
+
 **Гілка:** `feature/TASK-5.8` → merged into `main`
