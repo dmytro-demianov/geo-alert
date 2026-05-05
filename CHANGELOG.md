@@ -105,3 +105,74 @@ backend/pkg/migrator/migrator.go
 ```
 
 **Ветка:** `feature/TASK-1.3` → merged into `main`
+
+---
+
+## Сессия 2 — 2026-05-05 · агенты: backend + frontend (параллельно)
+
+---
+
+### [TASK-1.4] Google OAuth 2.0 + JWT
+
+**Микрозадачи:**
+- [x] **1.4.2** `POST /auth/google` — обмен Google auth code на user info; создание/обновление пользователя в БД
+- [x] **1.4.3** Генерация JWT access token (15 мин, HS256) + refresh token (30 дней, UUID, хранится SHA256-хэшем)
+- [x] **1.4.4** Middleware `AuthRequired` — Bearer token → парсинг Claims → `c.Set("user_id", uuid)`; 401 при невалидном токене
+- [x] **1.4.5** `POST /auth/refresh` — валидация refresh token, ротация (старый удаляется, новый создаётся)
+- [x] **1.4.6** `POST /auth/logout` — удаление refresh token из БД
+- [x] **1.4.7** `GET /auth/me` — возвращает профиль авторизованного пользователя
+- [x] Миграция 010: таблица `refresh_tokens` (token_hash, user_id FK, expires_at, индекс на user_id)
+- [x] Подключение DB + migrator в `main.go`; wire-up auth routes
+- [x] `config.go` — добавлен метод `DBConfig.URL()` для postgres URL (нужен migrator)
+
+**Файлы:**
+```
+backend/internal/auth/google.go
+backend/internal/auth/jwt.go
+backend/internal/domain/user.go
+backend/internal/handler/auth.go
+backend/internal/middleware/auth.go
+backend/internal/repository/user.go
+backend/internal/repository/refresh_token.go
+backend/internal/config/config.go  (добавлен URL())
+backend/cmd/server/main.go          (DB + migrator + auth routes)
+backend/migrations/010_refresh_tokens.{up,down}.sql
+```
+
+**Ветка:** `feature/TASK-1.4` → merged into `main`
+
+---
+
+### [TASK-5.1] Инициализация React проекта
+
+**Микрозадачи:**
+- [x] **5.1.1** Vite 5 + React 18 + TypeScript (strict mode, path alias `@/` → `src/`)
+- [x] **5.1.2** Tailwind CSS v3 + PostCSS + autoprefixer
+- [x] **5.1.3** React Router v6: `BrowserRouter` в `main.tsx`, `ProtectedRoute` (redirect `/login` если не авторизован)
+- [x] **5.1.4** HTTP-клиент `src/api/client.ts` — axios с двумя interceptors: attach Bearer token + auto-refresh при 401 (queue pending requests, rotate refresh token)
+- [x] **5.1.5** WebSocket клиент `src/ws/client.ts` — подключение с токеном, event emitter по типу сообщения, exponential backoff reconnect (1s → 30s max)
+- [x] **5.1.6** Zustand store `src/store/auth.ts` — tokens + user, persist в localStorage, `setTokens` / `setUser` / `logout`
+- [x] PWA `public/manifest.json` (standalone display, theme_color, icons)
+
+**Файлы:**
+```
+frontend/index.html
+frontend/package.json
+frontend/package-lock.json
+frontend/tsconfig.json
+frontend/tsconfig.node.json
+frontend/vite.config.ts
+frontend/tailwind.config.js
+frontend/postcss.config.js
+frontend/.gitignore
+frontend/public/manifest.json
+frontend/src/main.tsx
+frontend/src/App.tsx
+frontend/src/index.css
+frontend/src/api/client.ts
+frontend/src/api/types.ts
+frontend/src/store/auth.ts
+frontend/src/ws/client.ts
+```
+
+**Ветка:** `feature/TASK-5.1` → merged into `main`
