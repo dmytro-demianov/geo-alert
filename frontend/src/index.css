@@ -1,3 +1,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html, body {
+    @apply font-sans text-slate-900 bg-slate-100 antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Leaflet z-index baseline */
+  .leaflet-pane { z-index: 1 !important; }
+  .leaflet-top, .leaflet-bottom { z-index: 2 !important; }
+}
+
+@layer components {
+  /* Primary button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px]
+           bg-brand-500 text-white text-label font-semibold rounded-md
+           shadow-pin hover:bg-brand-600 active:bg-brand-700
+           transition-colors disabled:bg-slate-200 disabled:text-slate-300 disabled:cursor-not-allowed disabled:shadow-none;
+  }
+
+  /* Secondary button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px]
+           bg-white text-slate-900 text-label font-semibold rounded-md
+           border border-slate-300 hover:bg-slate-50 active:bg-slate-100
+           transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-[14px] py-[10px]
+           bg-transparent text-slate-900 text-label font-medium rounded-md
+           hover:bg-slate-100 active:bg-slate-200 transition-colors;
+  }
+
+  /* Input */
+  .input {
+    @apply w-full px-[14px] py-[10px] text-[15px] text-slate-900
+           border border-slate-300 rounded-md bg-white
+           placeholder:text-slate-400
+           focus:outline-none focus:border-brand-500 focus:shadow-focus
+           transition-shadow;
+  }
+
+  /* Card surface */
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-slate-200;
+  }
+
+  /* Privacy badge */
+  .badge-public   { @apply inline-flex items-center px-3 py-0.5 rounded-full text-overline bg-success text-white; }
+  .badge-private  { @apply inline-flex items-center px-3 py-0.5 rounded-full text-overline bg-slate-500 text-white; }
+  .badge-link     { @apply inline-flex items-center px-3 py-0.5 rounded-full text-overline bg-warning text-white; }
+}

@@ -354,3 +354,52 @@ tasks/BOARD.json                              (TASK-5.5 → merged)
 ```
 
 **Ветка:** `feature/TASK-5.5` → merged into `main`
+
+---
+
+### [TASK-5.11] Дизайн-система: інтеграція UI
+
+**Мікрозадачі:**
+- [x] **5.11.1** Tailwind config — brand/slate/heat/semantic кольори, Inter + JetBrains Mono, custom radius/shadow
+- [x] **5.11.2** index.html — Google Fonts preconnect, theme-color #ef4444
+- [x] **5.11.3** index.css — base layer (font, antialiased, Leaflet z-index), component classes
+- [x] **5.11.4** `components/ui/Icon.tsx` — inline SVG іконки (20+ icons, lucide-compatible paths)
+- [x] **5.11.5** `components/ui/Avatar.tsx` — градієнтний аватар з ініціалами або img
+- [x] **5.11.6** `components/ui/MarkerPin.tsx` — SVG pin, heatColor(weight) export
+- [x] **5.11.7** `components/ui/PrivacyBadge.tsx` — PUBLIC/LINK_ONLY/PRIVATE badge
+- [x] **5.11.8** `components/HeatLegend.tsx` — шкала heat, bottom-left overlay
+- [x] **5.11.9** `components/FAB.tsx` — круглий + button, shadow-pin, brand-500
+- [x] **5.11.10** `components/MapControls.tsx` — zoom/locate/layer switcher + onThemeChange callback
+- [x] **5.11.11** `components/TopBar.tsx` — логотип, SearchBar dropdown, NotificationsDropdown, UserDropdown
+- [x] **5.11.12** `components/LeftDrawer.tsx` — 360px slide-in, tabs Позначки/Картки/Мої, filter chips
+- [x] **5.11.13** `components/RightDrawer.tsx` — 420px, photo header, stats, like/route actions, comments
+- [x] **5.11.14** `components/Map/MapView.tsx` — кастомні SVG-маркери (DivIcon + heatColor), TileLayer switcher, LocateControl
+- [x] **5.11.15** `pages/MapPage.tsx` — fullscreen MainApp: усі overlay-компоненти разом
+- [x] **5.11.16** `App.tsx` — спрощений роутинг (тільки /, без /my-cards, /cards/:id)
+- [x] **5.11.17** `DESIGN.md` — довідник токенів для агентів
+- [x] **5.11.18** `CLAUDE.md` — додано посилання на DESIGN.md
+
+**Файли:**
+```
+frontend/tailwind.config.js                  (оновлено — design tokens)
+frontend/index.html                          (оновлено — Google Fonts)
+frontend/src/index.css                       (оновлено — base + component classes)
+frontend/src/App.tsx                         (спрощено — 1 роут)
+frontend/src/pages/MapPage.tsx               (переписано — fullscreen MainApp)
+frontend/src/components/Map/MapView.tsx      (оновлено — heat markers, theme switcher)
+frontend/src/components/TopBar.tsx           (новий)
+frontend/src/components/LeftDrawer.tsx       (новий)
+frontend/src/components/RightDrawer.tsx      (новий)
+frontend/src/components/MapControls.tsx      (оновлено — onThemeChange prop)
+frontend/src/components/HeatLegend.tsx       (новий)
+frontend/src/components/FAB.tsx              (новий)
+frontend/src/components/ui/Icon.tsx          (новий)
+frontend/src/components/ui/Avatar.tsx        (новий)
+frontend/src/components/ui/MarkerPin.tsx     (новий)
+frontend/src/components/ui/PrivacyBadge.tsx  (новий)
+DESIGN.md                                    (новий)
+CLAUDE.md                                    (оновлено — UI секція)
+tasks/BOARD.json                             (TASK-5.11 → merged)
+```
+
+**Гілка:** `feature/TASK-5.11` → merged into `main`

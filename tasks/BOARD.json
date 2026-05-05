@@ -4,7 +4,6 @@
     "frontend": "React, TypeScript, Leaflet, PWA",
     "ops": "Docker, CI/CD, деплой"
   },
-
   "config": {
     "lock_ttl_seconds": 30,
     "in_progress_timeout_hours": 4,
@@ -12,15 +11,11 @@
     "max_parallel_tasks": 3,
     "mock_api_spec": "tasks/mock-api.yaml"
   },
-
   "active_agents": {
     "backend": null,
-    "frontend": null,
     "ops": null
   },
-
   "tasks": {
-
     "TASK-1.1": {
       "title": "Инициализация Go проекта",
       "epic": "EPIC-1",
@@ -40,7 +35,9 @@
       "epic": "EPIC-1",
       "agent": "ops",
       "status": "todo",
-      "depends_on": ["TASK-1.1"],
+      "depends_on": [
+        "TASK-1.1"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -54,7 +51,9 @@
       "epic": "EPIC-1",
       "agent": "backend",
       "status": "merged",
-      "depends_on": ["TASK-1.1"],
+      "depends_on": [
+        "TASK-1.1"
+      ],
       "agent_instance": "agent-backend-1",
       "started_at": "2026-05-05T00:10:00Z",
       "done_at": "2026-05-05T01:00:00Z",
@@ -68,7 +67,9 @@
       "epic": "EPIC-1",
       "agent": "backend",
       "status": "merged",
-      "depends_on": ["TASK-1.3"],
+      "depends_on": [
+        "TASK-1.3"
+      ],
       "agent_instance": "agent-backend-2",
       "started_at": "2026-05-05T10:00:00Z",
       "done_at": "2026-05-05T11:00:00Z",
@@ -82,7 +83,9 @@
       "epic": "EPIC-1",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-1.4"],
+      "depends_on": [
+        "TASK-1.4"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -91,13 +94,14 @@
       "progress_notes": null,
       "error": null
     },
-
     "TASK-1.6": {
       "title": "Mock API Spec",
       "epic": "EPIC-1",
       "agent": "backend",
       "status": "merged",
-      "depends_on": ["TASK-1.1"],
+      "depends_on": [
+        "TASK-1.1"
+      ],
       "agent_instance": "agent-backend-1",
       "started_at": "2026-05-05T00:10:00Z",
       "done_at": "2026-05-05T00:30:00Z",
@@ -106,13 +110,15 @@
       "progress_notes": "done: tasks/mock-api.yaml — OpenAPI 3.0, все endpoints с примерами, x-websocket-messages",
       "error": null
     },
-
     "TASK-2.1": {
       "title": "Cards CRUD",
       "epic": "EPIC-2",
       "agent": "backend",
       "status": "merged",
-      "depends_on": ["TASK-1.3", "TASK-1.4"],
+      "depends_on": [
+        "TASK-1.3",
+        "TASK-1.4"
+      ],
       "agent_instance": "agent-backend-1",
       "started_at": "2026-05-05T12:00:00Z",
       "done_at": "2026-05-05T13:00:00Z",
@@ -126,7 +132,9 @@
       "epic": "EPIC-2",
       "agent": "backend",
       "status": "merged",
-      "depends_on": ["TASK-2.1"],
+      "depends_on": [
+        "TASK-2.1"
+      ],
       "agent_instance": "agent-backend-1",
       "started_at": "2026-05-05T14:00:00Z",
       "done_at": "2026-05-05T15:30:00Z",
@@ -140,7 +148,9 @@
       "epic": "EPIC-2",
       "agent": "backend",
       "status": "merged",
-      "depends_on": ["TASK-2.2"],
+      "depends_on": [
+        "TASK-2.2"
+      ],
       "agent_instance": "agent-backend-1",
       "started_at": "2026-05-05T16:00:00Z",
       "done_at": "2026-05-05T17:00:00Z",
@@ -154,7 +164,9 @@
       "epic": "EPIC-2",
       "agent": "backend",
       "status": "merged",
-      "depends_on": ["TASK-2.2"],
+      "depends_on": [
+        "TASK-2.2"
+      ],
       "agent_instance": "agent-backend-1",
       "started_at": "2026-05-05T16:00:00Z",
       "done_at": "2026-05-05T17:30:00Z",
@@ -168,7 +180,9 @@
       "epic": "EPIC-2",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-2.2"],
+      "depends_on": [
+        "TASK-2.2"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -182,7 +196,9 @@
       "epic": "EPIC-2",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-1.1"],
+      "depends_on": [
+        "TASK-1.1"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -196,7 +212,10 @@
       "epic": "EPIC-2",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-2.2", "TASK-4.4"],
+      "depends_on": [
+        "TASK-2.2",
+        "TASK-4.4"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -205,13 +224,14 @@
       "progress_notes": null,
       "error": null
     },
-
     "TASK-3.1": {
       "title": "Подписки",
       "epic": "EPIC-3",
       "agent": "backend",
       "status": "merged",
-      "depends_on": ["TASK-2.1"],
+      "depends_on": [
+        "TASK-2.1"
+      ],
       "agent_instance": "agent-backend-1",
       "started_at": "2026-05-05T14:00:00Z",
       "done_at": "2026-05-05T15:30:00Z",
@@ -225,7 +245,9 @@
       "epic": "EPIC-3",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-1.4"],
+      "depends_on": [
+        "TASK-1.4"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -239,7 +261,9 @@
       "epic": "EPIC-3",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-1.4"],
+      "depends_on": [
+        "TASK-1.4"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -253,7 +277,11 @@
       "epic": "EPIC-3",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-3.1", "TASK-3.2", "TASK-3.3"],
+      "depends_on": [
+        "TASK-3.1",
+        "TASK-3.2",
+        "TASK-3.3"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -267,7 +295,10 @@
       "epic": "EPIC-3",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-2.2", "TASK-3.3"],
+      "depends_on": [
+        "TASK-2.2",
+        "TASK-3.3"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -276,13 +307,14 @@
       "progress_notes": null,
       "error": null
     },
-
     "TASK-4.1": {
       "title": "WebSocket Real-time",
       "epic": "EPIC-4",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-1.4"],
+      "depends_on": [
+        "TASK-1.4"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -296,7 +328,9 @@
       "epic": "EPIC-4",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-2.2"],
+      "depends_on": [
+        "TASK-2.2"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -310,7 +344,9 @@
       "epic": "EPIC-4",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-1.4"],
+      "depends_on": [
+        "TASK-1.4"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -324,7 +360,9 @@
       "epic": "EPIC-4",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-4.3"],
+      "depends_on": [
+        "TASK-4.3"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -338,7 +376,10 @@
       "epic": "EPIC-4",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-2.2", "TASK-2.6"],
+      "depends_on": [
+        "TASK-2.2",
+        "TASK-2.6"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -347,7 +388,6 @@
       "progress_notes": null,
       "error": null
     },
-
     "TASK-5.1": {
       "title": "Инициализация React проекта",
       "epic": "EPIC-5",
@@ -367,7 +407,10 @@
       "epic": "EPIC-5",
       "agent": "frontend",
       "status": "todo",
-      "depends_on": ["TASK-5.1", "TASK-1.4"],
+      "depends_on": [
+        "TASK-5.1",
+        "TASK-1.4"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -381,7 +424,9 @@
       "epic": "EPIC-5",
       "agent": "frontend",
       "status": "merged",
-      "depends_on": ["TASK-5.1"],
+      "depends_on": [
+        "TASK-5.1"
+      ],
       "agent_instance": "agent-frontend-1",
       "started_at": "2026-05-05T12:00:00Z",
       "done_at": "2026-05-05T13:00:00Z",
@@ -395,7 +440,10 @@
       "epic": "EPIC-5",
       "agent": "frontend",
       "status": "merged",
-      "depends_on": ["TASK-5.3", "TASK-2.1"],
+      "depends_on": [
+        "TASK-5.3",
+        "TASK-2.1"
+      ],
       "agent_instance": "agent-frontend-1",
       "started_at": "2026-05-05T14:00:00Z",
       "done_at": "2026-05-05T15:30:00Z",
@@ -409,7 +457,10 @@
       "epic": "EPIC-5",
       "agent": "frontend",
       "status": "merged",
-      "depends_on": ["TASK-5.3", "TASK-2.2"],
+      "depends_on": [
+        "TASK-5.3",
+        "TASK-2.2"
+      ],
       "agent_instance": "agent-frontend-1",
       "started_at": "2026-05-05T16:00:00Z",
       "done_at": "2026-05-05T17:30:00Z",
@@ -423,7 +474,11 @@
       "epic": "EPIC-5",
       "agent": "frontend",
       "status": "todo",
-      "depends_on": ["TASK-5.5", "TASK-2.3", "TASK-2.4"],
+      "depends_on": [
+        "TASK-5.5",
+        "TASK-2.3",
+        "TASK-2.4"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -437,7 +492,11 @@
       "epic": "EPIC-5",
       "agent": "frontend",
       "status": "todo",
-      "depends_on": ["TASK-5.1", "TASK-3.1", "TASK-3.2"],
+      "depends_on": [
+        "TASK-5.1",
+        "TASK-3.1",
+        "TASK-3.2"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -451,7 +510,10 @@
       "epic": "EPIC-5",
       "agent": "frontend",
       "status": "todo",
-      "depends_on": ["TASK-5.1", "TASK-3.4"],
+      "depends_on": [
+        "TASK-5.1",
+        "TASK-3.4"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -465,7 +527,10 @@
       "epic": "EPIC-5",
       "agent": "frontend",
       "status": "todo",
-      "depends_on": ["TASK-5.1", "TASK-3.5"],
+      "depends_on": [
+        "TASK-5.1",
+        "TASK-3.5"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -479,7 +544,11 @@
       "epic": "EPIC-5",
       "agent": "frontend",
       "status": "todo",
-      "depends_on": ["TASK-5.1", "TASK-4.3", "TASK-4.4"],
+      "depends_on": [
+        "TASK-5.1",
+        "TASK-4.3",
+        "TASK-4.4"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -488,13 +557,32 @@
       "progress_notes": null,
       "error": null
     },
-
+    "TASK-5.11": {
+      "title": "Дизайн-система: интеграция UI",
+      "epic": "EPIC-5",
+      "agent": "frontend",
+      "status": "merged",
+      "depends_on": [
+        "TASK-5.5"
+      ],
+      "agent_instance": "agent-frontend-2",
+      "started_at": "2026-05-05T18:00:00Z",
+      "done_at": null,
+      "merged_at": "2026-05-05T00:00:00Z",
+      "branch": "feature/TASK-5.11",
+      "progress_notes": null,
+      "error": null
+    },
     "TASK-6.1": {
       "title": "Тесты Backend",
       "epic": "EPIC-6",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-2.2", "TASK-3.2", "TASK-4.1"],
+      "depends_on": [
+        "TASK-2.2",
+        "TASK-3.2",
+        "TASK-4.1"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -508,7 +596,9 @@
       "epic": "EPIC-6",
       "agent": "frontend",
       "status": "todo",
-      "depends_on": ["TASK-5.5"],
+      "depends_on": [
+        "TASK-5.5"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -522,7 +612,9 @@
       "epic": "EPIC-6",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-2.2"],
+      "depends_on": [
+        "TASK-2.2"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -536,7 +628,10 @@
       "epic": "EPIC-6",
       "agent": "backend",
       "status": "todo",
-      "depends_on": ["TASK-1.4", "TASK-2.6"],
+      "depends_on": [
+        "TASK-1.4",
+        "TASK-2.6"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -550,7 +645,13 @@
       "epic": "EPIC-6",
       "agent": "ops",
       "status": "todo",
-      "depends_on": ["TASK-1.2", "TASK-6.1", "TASK-6.2", "TASK-6.3", "TASK-6.4"],
+      "depends_on": [
+        "TASK-1.2",
+        "TASK-6.1",
+        "TASK-6.2",
+        "TASK-6.3",
+        "TASK-6.4"
+      ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
@@ -559,6 +660,5 @@
       "progress_notes": null,
       "error": null
     }
-
   }
 }
