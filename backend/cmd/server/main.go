@@ -40,10 +40,12 @@ func main() {
 	tokenRepo := repository.NewRefreshTokenRepo(db)
 	cardRepo := repository.NewCardRepo(db)
 	markerRepo := repository.NewMarkerRepo(db)
+	subRepo := repository.NewSubscriptionRepo(db)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
 	cardHandler := handler.NewCardHandler(cardRepo)
 	markerHandler := handler.NewMarkerHandler(markerRepo, cardRepo)
+	subHandler := handler.NewSubscriptionHandler(subRepo, cardRepo)
 	authMW := middleware.AuthRequired(jwtSvc)
 	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
@@ -92,6 +94,13 @@ func main() {
 		cardMarkers.GET("", optionalAuthMW, markerHandler.ListMarkers)
 		cardMarkers.POST("", authMW, markerHandler.CreateMarker)
 	}
+
+	subs := r.Group("/subscriptions")
+	{
+		subs.POST("", authMW, subHandler.Subscribe)
+		subs.DELETE("/:id", authMW, subHandler.Unsubscribe)
+	}
+	r.GET("/me/subscriptions", authMW, subHandler.ListMySubscriptions)
 
 	addr := ":" + cfg.Server.Port
 	log.Info().Str("addr", addr).Str("env", cfg.Server.Env).Msg("server starting")
