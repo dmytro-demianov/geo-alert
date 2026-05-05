@@ -403,3 +403,22 @@ tasks/BOARD.json                             (TASK-5.11 → merged)
 ```
 
 **Гілка:** `feature/TASK-5.11` → merged into `main`
+
+---
+
+### [TASK-2.5] Просмотри (view_count)
+
+**Мікрозадачі:**
+- [x] **2.5.1** `POST /markers/:id/views` — фіксує перегляд з дедуплікацією по `X-Session-ID` (in-memory TTL 1 год)
+- [x] **2.5.2** `view_count` в GET /markers/:id — тільки для автора (вже було реалізовано)
+- [x] Прибрано авто-інкремент з `GET /markers/:id` — тепер клієнт викликає POST /views явно
+
+**Файли:**
+```
+backend/internal/handler/view.go     (новий — ViewHandler з viewCache)
+backend/internal/handler/marker.go   (прибрано IncrementViewCount з GetMarker)
+backend/cmd/server/main.go           (додано viewHandler + маршрут POST /:id/views)
+tasks/BOARD.json                     (TASK-2.5 → merged)
+```
+
+**Гілка:** `feature/TASK-2.5` → merged into `main`

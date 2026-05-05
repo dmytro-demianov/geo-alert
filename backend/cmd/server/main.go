@@ -50,6 +50,7 @@ func main() {
 	subHandler := handler.NewSubscriptionHandler(subRepo, cardRepo)
 	commentHandler := handler.NewCommentHandler(commentRepo, markerRepo, cardRepo)
 	likeHandler := handler.NewLikeHandler(likeRepo, markerRepo)
+	viewHandler := handler.NewViewHandler(markerRepo)
 	authMW := middleware.AuthRequired(jwtSvc)
 	optionalAuthMW := middleware.OptionalAuth(jwtSvc)
 
@@ -91,6 +92,7 @@ func main() {
 		markers.GET("/:id", optionalAuthMW, markerHandler.GetMarker)
 		markers.PUT("/:id", authMW, markerHandler.UpdateMarker)
 		markers.DELETE("/:id", authMW, markerHandler.DeleteMarker)
+		markers.POST("/:id/views", viewHandler.RecordView)
 		markers.POST("/:id/likes", authMW, likeHandler.ToggleLike)
 		markers.GET("/:id/comments", commentHandler.ListComments)
 		markers.POST("/:id/comments", authMW, commentHandler.CreateComment)

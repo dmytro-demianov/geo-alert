@@ -327,9 +327,6 @@ func (h *MarkerHandler) GetMarker(c *gin.Context) {
 		}
 	}
 
-	_ = h.markers.IncrementViewCount(id)
-	marker.ViewCount++
-
 	c.JSON(http.StatusOK, markerResponse(marker, callerID))
 }
 

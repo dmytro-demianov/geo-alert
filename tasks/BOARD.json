@@ -179,14 +179,14 @@
       "title": "Просмотры (view_count)",
       "epic": "EPIC-2",
       "agent": "backend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-2.2"
       ],
       "agent_instance": null,
       "started_at": null,
       "done_at": null,
-      "merged_at": null,
+      "merged_at": "2026-05-05T00:00:00Z",
       "branch": null,
       "progress_notes": null,
       "error": null
