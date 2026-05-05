@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Geo-Alert · UI Kit</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="../../assets/logo-mark.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #0F172A; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  @keyframes gd-pulse {
+    0%   { transform: scale(0.85); opacity: 0.9; }
+    70%  { transform: scale(1.15); opacity: 0; }
+    100% { transform: scale(1.15); opacity: 0; }
+  }
+  .frame {
+    width: 390px; height: 800px;
+    margin: 24px auto;
+    background: #fff; border-radius: 36px;
+    box-shadow: 0 24px 48px rgba(15,23,42,0.4), 0 8px 16px rgba(15,23,42,0.2);
+    overflow: hidden; position: relative;
+    border: 8px solid #0F172A;
+  }
+  .stage { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; padding: 24px; }
+  .header { text-align: center; padding: 32px 24px 0; color: #fff; }
+  .header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .header p { color: #94A3B8; font-size: 14px; margin: 0; }
+  .nav { position: fixed; top: 16px; left: 16px; z-index: 99; display: flex; gap: 6px; flex-wrap: wrap; max-width: calc(100vw - 32px); }
+  .nav button { background: rgba(15,23,42,0.85); color: #fff; border: 1px solid #334155; padding: 6px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; backdrop-filter: blur(8px); }
+  .nav button.active { background: #EF4444; border-color: #EF4444; }
+  .label { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94A3B8; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="Icon.jsx"></script>
+<script type="text/babel" src="Primitives.jsx"></script>
+<script type="text/babel" src="MapCanvas.jsx"></script>
+<script type="text/babel" src="Screens.jsx"></script>
+
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+
+function App() {
+  const [screen, setScreen] = useState('all'); // all | login | map | detail | create | feed
+  const [activeMarker, setActiveMarker] = useState(null);
+
+  const screens = [
+    { key: 'all',    label: 'Overview' },
+    { key: 'login',  label: 'Login' },
+    { key: 'map',    label: 'Map' },
+    { key: 'detail', label: 'Marker' },
+    { key: 'create', label: 'Create' },
+    { key: 'feed',   label: 'Feed' },
+  ];
+
+  const Frame = ({ label, children }) => (
+    <div style={{ position: 'relative' }}>
+      <div className="label">{label}</div>
+      <div className="frame">{children}</div>
+    </div>
+  );
+
+  if (screen === 'all') {
+    return (
+      <div>
+        <div className="nav">
+          {screens.map(s => (
+            <button key={s.key} className={s.key === screen ? 'active' : ''} onClick={() => setScreen(s.key)}>{s.label}</button>
+          ))}
+        </div>
+        <div className="header">
+          <h1>Geo-Alert · UI Kit</h1>
+          <p>Five core screens · click a tab above to focus one</p>
+        </div>
+        <div className="stage">
+          <Frame label="Login"><LoginScreen onLogin={() => setScreen('map')}/></Frame>
+          <Frame label="Map"><MapScreen onOpenMarker={(m)=>{setActiveMarker(m); setScreen('detail');}} onOpenCreate={()=>setScreen('create')} onOpenFeed={()=>setScreen('feed')}/></Frame>
+          <Frame label="Marker"><MarkerDetailScreen marker={({ id:'m1', title:'Золоті ворота', description:"Пам'ятка архітектури XI ст. Гарне місце для прогулянок ранком.", lat:50.4501, lon:30.5234, like_weight:7, comment_count:3, view_count:1247, tags:['история','архитектура'], photos:['#FCA5A5','#FBBF24','#A7F3D0'], author:{name:'Анна К.', hue:0} })} onClose={()=>setScreen('all')}/></Frame>
+          <Frame label="Create"><CreateMarkerScreen onClose={()=>setScreen('all')} onSubmit={()=>setScreen('map')}/></Frame>
+          <Frame label="Feed"><FeedScreen onClose={()=>setScreen('all')} onOpenMarker={(m)=>{setActiveMarker(m); setScreen('detail');}}/></Frame>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="nav">
+        {screens.map(s => (
+          <button key={s.key} className={s.key === screen ? 'active' : ''} onClick={() => setScreen(s.key)}>{s.label}</button>
+        ))}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <div className="frame">
+          {screen === 'login' && <LoginScreen onLogin={() => setScreen('map')}/>}
+          {screen === 'map'   && <MapScreen onOpenMarker={(m)=>{setActiveMarker(m); setScreen('detail');}} onOpenCreate={()=>setScreen('create')} onOpenFeed={()=>setScreen('feed')}/>}
+          {screen === 'detail' && <MarkerDetailScreen marker={activeMarker || { id:'m1', title:'Золоті ворота', description:"Пам'ятка архітектури XI ст.", lat:50.4501, lon:30.5234, like_weight:7, comment_count:3, view_count:1247, tags:['история','архитектура'], photos:['#FCA5A5','#FBBF24'], author:{name:'Анна К.', hue:0} }} onClose={()=>setScreen('map')}/>}
+          {screen === 'create' && <CreateMarkerScreen onClose={()=>setScreen('map')} onSubmit={()=>setScreen('map')}/>}
+          {screen === 'feed'   && <FeedScreen onClose={()=>setScreen('map')} onOpenMarker={(m)=>{setActiveMarker(m); setScreen('detail');}}/>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

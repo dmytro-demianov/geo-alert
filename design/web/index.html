@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Geo-Alert · Web</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="../assets/logo-mark.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #0F172A; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; overflow: hidden; }
+  #root { height: 100vh; position: relative; }
+  @keyframes gd-pulse { 0% { transform: scale(0.85); opacity: 0.9; } 70% { transform: scale(1.15); opacity: 0; } 100% { transform: scale(1.15); opacity: 0; } }
+  @keyframes gd-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes gd-pop { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+  @keyframes gd-slide-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  @keyframes gd-slide-down { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  button:focus { outline: none; }
+  *::-webkit-scrollbar { width: 8px; height: 8px; }
+  *::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="../ui_kits/geo-alert-app/Icon.jsx"></script>
+<script type="text/babel" src="../ui_kits/geo-alert-app/Primitives.jsx"></script>
+<script type="text/babel" src="MapBg.jsx"></script>
+<script type="text/babel" src="MarkersOverlay.jsx"></script>
+<script type="text/babel" src="SidePanel.jsx"></script>
+<script type="text/babel" src="Modals.jsx"></script>
+<script type="text/babel" src="TopBarAndChrome.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const MARKERS = [
+  { id: 'm1', title: 'Золоті ворота', description: "Памʼятка архітектури XI ст. Гарне місце для прогулянок ранком.",
+    lat: 50.4501, lon: 30.5234, like_weight: 7, comment_count: 3, view_count: 1247,
+    tags: ['історія','архітектура'], dist: 120,
+    x: 720, y: 420, photos: ['#FCA5A5','#FBBF24'], author: { name: 'Анна К.', hue: 0 } },
+  { id: 'm2', title: "Кав'ярня «Один»", description: 'Найкраща кава в районі. Wi-Fi і затишок.',
+    lat: 50.4510, lon: 30.5210, like_weight: 12, comment_count: 7, view_count: 892,
+    tags: ['кафе','wi-fi'], dist: 240,
+    x: 480, y: 540, photos: ['#FBBF24'], author: { name: 'Михайло', hue: 1 } },
+  { id: 'm3', title: 'Скейт-парк', description: 'Маленький, але класний.',
+    lat: 50.4490, lon: 30.5260, like_weight: 4, comment_count: 1, view_count: 312,
+    tags: ['спорт'], dist: 410,
+    x: 1080, y: 580, photos: [], author: { name: 'Костя', hue: 2 } },
+  { id: 'm4', title: 'Стара синагога', description: '',
+    lat: 50.4520, lon: 30.5180, like_weight: 1, comment_count: 0, view_count: 88,
+    tags: ['історія'], dist: 680,
+    x: 320, y: 280, photos: [], author: { name: 'Олена', hue: 3 } },
+  { id: 'm5', title: 'Закинутий двір', description: '',
+    lat: 50.4480, lon: 30.5300, like_weight: -2, comment_count: 0, view_count: 22,
+    tags: [], dist: 920,
+    x: 1280, y: 720, photos: [], author: { name: 'Аноним', hue: 4 } },
+];
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "loggedIn": true,
+  "leftOpen": false,
+  "mapTheme": "light",
+  "modalCycle": "login"
+}/*EDITMODE-END*/;
+
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  const loggedIn = tweaks.loggedIn;
+  const [leftOpen, setLeftOpen] = useState(tweaks.leftOpen);
+  useEffect(() => setLeftOpen(tweaks.leftOpen), [tweaks.leftOpen]);
+
+  const [mapTheme, setMapTheme] = useState(tweaks.mapTheme);
+  useEffect(() => setMapTheme(tweaks.mapTheme), [tweaks.mapTheme]);
+
+  const [activeMarker, setActiveMarker] = useState(MARKERS[0]);
+  const [rightOpen, setRightOpen] = useState(false);
+
+  // Modals
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [collOpen, setCollOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  // Popovers
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
+  const [layerOpen, setLayerOpen] = useState(false);
+
+  // Chrome
+  const [tooltipDismissed, setTooltipDismissed] = useState(false);
+  const [toastVisible, setToastVisible] = useState(true);
+
+  // Modal cycle from tweaks
+  useEffect(() => {
+    setLoginOpen(false); setCreateOpen(false); setRightOpen(false); setShareOpen(false);
+    if (tweaks.modalCycle === 'login') setLoginOpen(true);
+    if (tweaks.modalCycle === 'create') setCreateOpen(true);
+    if (tweaks.modalCycle === 'detail') { setActiveMarker(MARKERS[0]); setRightOpen(true); }
+    if (tweaks.modalCycle === 'share') setShareOpen(true);
+  }, [tweaks.modalCycle]);
+
+  const closeAllPopovers = () => {
+    setSearchOpen(false); setNotifOpen(false); setUserOpen(false); setLayerOpen(false);
+  };
+
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: '#0F172A' }}
+         onClick={closeAllPopovers}>
+      {/* MAP */}
+      <FullMap theme={mapTheme}>
+        <MarkersOverlay markers={MARKERS}
+                        selectedId={rightOpen ? activeMarker?.id : null}
+                        onSelect={(id)=>{ setActiveMarker(MARKERS.find(m=>m.id===id)); setRightOpen(true); }}
+                        userPos={{ x: 640, y: 360 }}/>
+      </FullMap>
+
+      {/* HEAT LEGEND */}
+      <HeatLegend/>
+
+      {/* MAP CONTROLS */}
+      <div onClick={e=>e.stopPropagation()}>
+        <MapControls
+          mapTheme={mapTheme}
+          onChangeTheme={(t)=>{ setMapTheme(t); setTweak('mapTheme', t); }}
+          onLocate={()=>{}}
+          onLayer={()=>{ closeAllPopovers(); setLayerOpen(o=>!o); }}
+          layerOpen={layerOpen}
+          onLayerClose={()=>setLayerOpen(false)}
+        />
+      </div>
+
+      {/* LEFT DRAWER */}
+      <LeftDrawer open={leftOpen}
+                  onClose={()=>{ setLeftOpen(false); setTweak('leftOpen', false); }}
+                  markers={MARKERS}
+                  onOpenMarker={(m)=>{ setActiveMarker(m); setRightOpen(true); }}
+                  onCreateCard={()=>setCollOpen(true)}/>
+
+      {/* TOP BAR */}
+      <div onClick={e=>e.stopPropagation()}>
+        <TopBar loggedIn={loggedIn}
+                onMenu={()=>{ setLeftOpen(o=>!o); setTweak('leftOpen', !leftOpen); }}
+                onSearch={()=>{ closeAllPopovers(); setSearchOpen(true); }}
+                searchOpen={searchOpen}
+                onSearchClose={()=>setSearchOpen(false)}
+                onNotif={()=>{ closeAllPopovers(); setNotifOpen(o=>!o); }}
+                notifOpen={notifOpen}
+                onNotifClose={()=>setNotifOpen(false)}
+                onUser={()=>{ closeAllPopovers(); setUserOpen(o=>!o); }}
+                userOpen={userOpen}
+                onUserClose={()=>setUserOpen(false)}
+                onLogin={()=>setLoginOpen(true)}
+                onProfile={()=>{ setUserOpen(false); setProfileOpen(true); }}
+                onLogout={()=>{ setUserOpen(false); setTweak('loggedIn', false); }}
+                onCreateCard={()=>setCollOpen(true)}/>
+      </div>
+
+      {/* ONBOARDING */}
+      {loggedIn && !tooltipDismissed && (
+        <OnboardingTooltip onDismiss={()=>setTooltipDismissed(true)}/>
+      )}
+
+      {/* TOAST */}
+      {loggedIn && toastVisible && (
+        <ProximityToast onClose={()=>setToastVisible(false)} onOpen={()=>{ setActiveMarker(MARKERS[0]); setRightOpen(true); setToastVisible(false); }}/>
+      )}
+
+      {/* RIGHT DRAWER */}
+      {rightOpen && activeMarker && (
+        <RightDrawer marker={activeMarker}
+                     onClose={()=>setRightOpen(false)}
+                     onShare={()=>setShareOpen(true)}
+                     onDelete={()=>setConfirmOpen(true)}/>
+      )}
+
+      {/* MODALS */}
+      <LoginModal open={loginOpen} onClose={()=>setLoginOpen(false)} onLogin={()=>{ setLoginOpen(false); setTweak('loggedIn', true); }}/>
+      <CreateMarkerModal open={createOpen} onClose={()=>setCreateOpen(false)} onSubmit={()=>setCreateOpen(false)}/>
+      <ShareModal open={shareOpen} onClose={()=>setShareOpen(false)}/>
+      <PrivacyModal open={privacyOpen} onClose={()=>setPrivacyOpen(false)}/>
+      <ProfileModal open={profileOpen} onClose={()=>setProfileOpen(false)} onLogout={()=>{ setProfileOpen(false); setTweak('loggedIn', false); }}/>
+      <CollectionModal open={collOpen} onClose={()=>setCollOpen(false)}/>
+      <ConfirmModal open={confirmOpen} onClose={()=>setConfirmOpen(false)} onConfirm={()=>{ setConfirmOpen(false); setRightOpen(false); }}/>
+
+      {/* FAB to open Create */}
+      {loggedIn && (
+        <button onClick={()=>setCreateOpen(true)} style={{
+          position: 'absolute', bottom: 24, right: 78, zIndex: 100,
+          width: 56, height: 56, borderRadius: 9999,
+          background: '#EF4444', color: '#fff', border: 0, cursor: 'pointer',
+          boxShadow: '0 6px 16px rgba(239,68,68,0.45), 0 2px 4px rgba(239,68,68,0.30)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Icon name="plus" size={26} sw={2.4}/>
+        </button>
+      )}
+
+      {/* TWEAKS PANEL */}
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Стан">
+          <TweakToggle label="Залогінений" value={tweaks.loggedIn} onChange={v=>setTweak('loggedIn', v)}/>
+          <TweakToggle label="Лівий список" value={tweaks.leftOpen} onChange={v=>setTweak('leftOpen', v)}/>
+        </TweakSection>
+        <TweakSection label="Карта">
+          <TweakRadio label="Тема" value={tweaks.mapTheme}
+                      options={[{value:'light',label:'Світла'},{value:'dark',label:'Темна'},{value:'satellite',label:'Супутник'}]}
+                      onChange={v=>setTweak('mapTheme', v)}/>
+        </TweakSection>
+        <TweakSection label="Модалка">
+          <TweakSelect label="Відкрити" value={tweaks.modalCycle}
+                       options={[{value:'none',label:'— нічого —'},{value:'login',label:'Login'},{value:'create',label:'Створити позначку'},{value:'detail',label:'Деталь позначки'},{value:'share',label:'Поділитися'}]}
+                       onChange={v=>setTweak('modalCycle', v)}/>
+        </TweakSection>
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

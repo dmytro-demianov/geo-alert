@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 64" fill="none">
+  <path d="M32 4C18.7 4 8 14.7 8 28c0 18 24 32 24 32s24-14 24-32C56 14.7 45.3 4 32 4z" fill="#EF4444"></path>
+  <circle cx="32" cy="28" r="9" fill="#FFFFFF"></circle>
+  <path d="M32 22a6 6 0 016 6" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" fill="none"></path>
+  <path d="M32 25a3 3 0 013 3" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" fill="none"></path>
+  <circle cx="32" cy="28" r="1.5" fill="#EF4444"></circle>
+  <text x="76" y="42" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="32" fill="#0F172A" letter-spacing="-0.02em">Geo-Alert</text>
+</svg>
