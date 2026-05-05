@@ -692,32 +692,32 @@
       "title": "Профілі: PUT /users/me (редагування)",
       "epic": "EPIC-3",
       "agent": "backend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-3.3-A"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-backend-4",
+      "started_at": "2026-05-05T19:30:00Z",
+      "done_at": "2026-05-05T20:00:00Z",
+      "merged_at": "2026-05-05T20:00:00Z",
+      "branch": "feature/TASK-3.3-B",
+      "progress_notes": "done: PUT /users/me (display_name/bio/avatar_url, валидация длины), UserRepo.UpdateProfile, UserHandler.UpdateMe",
       "error": null
     },
     "TASK-3.3-C": {
       "title": "Профілі: DELETE /users/me (soft delete + cascade)",
       "epic": "EPIC-3",
       "agent": "backend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-3.3-A"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-backend-4",
+      "started_at": "2026-05-05T19:30:00Z",
+      "done_at": "2026-05-05T20:00:00Z",
+      "merged_at": "2026-05-05T20:00:00Z",
+      "branch": "feature/TASK-3.3-B",
+      "progress_notes": "done: DELETE /users/me (soft delete user + cascade soft delete cards + invalidate sessions), UserRepo.SoftDelete, CardRepo.SoftDeleteByOwner, UserHandler.DeleteMe",
       "error": null
     },
     "TASK-5.6-A": {

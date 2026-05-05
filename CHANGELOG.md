@@ -486,3 +486,42 @@ backend/cmd/server/main.go                 (blockRepo, blockHandler, 5 новы�
 ```
 
 **Ветка:** `feature/TASK-3.2` → merged into `main`
+
+---
+
+### [TASK-3.3-B] Профили: PUT /users/me (редактирование)
+
+**Микрозадачи:**
+- [x] **3.3.2** `PUT /users/me` — обновление `display_name` (макс 100), `bio` (макс 150), `avatar_url`
+- [x] Проверка что хотя бы одно поле передано
+- [x] `UserRepo.UpdateProfile` — атомарное обновление через GORM Updates
+- [x] `UserHandler.UpdateMe`
+
+**Файлы:**
+```
+backend/internal/handler/user.go    (добавлен UpdateMe)
+backend/internal/repository/user.go (добавлен UpdateProfile)
+backend/cmd/server/main.go          (роут PUT /users/me)
+```
+
+**Ветка:** `feature/TASK-3.3-B` → merged into `main`
+
+---
+
+### [TASK-3.3-C] Профили: DELETE /users/me (soft delete + cascade)
+
+**Микрозадачи:**
+- [x] **3.3.3** `DELETE /users/me` — soft delete пользователя (`deleted_at = NOW()`, `fcm_token = ""`)
+- [x] Cascade soft delete всех карт пользователя (`CardRepo.SoftDeleteByOwner`)
+- [x] Инвалидация всех refresh-токенов (`RefreshTokenRepo.DeleteByUserID`)
+- [x] Маркеры недоступны автоматически через FK на soft-deleted карты
+
+**Файлы:**
+```
+backend/internal/handler/user.go    (добавлен DeleteMe)
+backend/internal/repository/user.go (добавлен SoftDelete)
+backend/internal/repository/card.go (добавлен SoftDeleteByOwner)
+backend/cmd/server/main.go          (роут DELETE /users/me)
+```
+
+**Ветка:** `feature/TASK-3.3-B` → merged into `main`
