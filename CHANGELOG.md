@@ -525,3 +525,47 @@ backend/cmd/server/main.go          (роут DELETE /users/me)
 ```
 
 **Ветка:** `feature/TASK-3.3-B` → merged into `main`
+
+---
+
+## Сессия 4 — 2026-05-05 · агент: backend-5
+
+---
+
+### [TASK-3.4] Лента активности
+
+**Микрозадачи:**
+- [x] **3.4.1** `GET /feed` — маркеры из подписанных карт + карт подписанных юзеров, cursor pagination (before/before_id)
+- [x] **3.4.2** Дедупликация натуральная — маркер принадлежит одной карте, OR-условие не дублирует
+- [x] **3.4.3** Фильтры: `deleted_at IS NULL`, `expires_at > NOW()`, `is_draft = false`, блокировки через `blocked_users`
+- [x] `next_cursor` в ответе для постраничной загрузки
+
+**Файлы:**
+```
+backend/internal/repository/feed.go  (новый — FeedRepo.FeedItems)
+backend/internal/handler/feed.go     (новый — FeedHandler.GetFeed)
+backend/cmd/server/main.go           (feedRepo, feedHandler, GET /feed)
+```
+
+**Ветка:** `feature/TASK-3.4` → merged into `main`
+
+---
+
+### [TASK-3.5] Поиск
+
+**Микрозадачи:**
+- [x] **3.5.1** `GET /search?type=markers&q=` — fulltext через `to_tsvector`/`plainto_tsquery('simple')`, фильтр по тегам (`&&`), сортировка по `like_weight`
+- [x] **3.5.2** `GET /search?type=cards&q=` — fulltext по PUBLIC картам, сортировка по `subscriber_count`
+- [x] **3.5.3** `GET /search?type=users&q=` — ILIKE по `display_name`, без удалённых
+- [x] Параметры: `limit` (макс 100), `offset`, `tags` (через запятую)
+- [x] `domain/card.go`: добавлены поля `MarkerCount`, `SubscriberCount`
+
+**Файлы:**
+```
+backend/internal/repository/search.go  (новый — SearchRepo: SearchMarkers/Cards/Users)
+backend/internal/handler/search.go     (новый — SearchHandler.Search)
+backend/internal/domain/card.go        (MarkerCount + SubscriberCount)
+backend/cmd/server/main.go             (searchRepo, searchHandler, GET /search)
+```
+
+**Ветка:** `feature/TASK-3.5` → merged into `main`
