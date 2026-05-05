@@ -223,3 +223,73 @@ frontend/package-lock.json
 ```
 
 **Ветка:** `feature/TASK-5.3` → merged into `main`
+
+---
+
+## Сессия 4 — 2026-05-05 · агенты: backend + backend + frontend (три задачи)
+
+---
+
+### [TASK-2.2] Markers CRUD
+
+**Микрозадачи:**
+- [x] `internal/domain/marker.go` — Marker: NotificationType/ExpirationType ENUMs, `pq.StringArray` для images/tags, PostGIS поля отдельно (latitude/longitude)
+- [x] `internal/repository/marker.go` — raw SQL INSERT с `ST_SetSRID(ST_MakePoint(lon, lat), 4326)`, cursor-based pagination (newest/oldest/popular), `FindNearby` (ST_DWithin), soft delete, marker_count инкремент/декремент
+- [x] `internal/middleware/auth.go` — добавлен `OptionalAuth` (устанавливает user_id если токен валиден, не блокирует)
+- [x] `internal/handler/marker.go` — `POST/GET /cards/:id/markers`, `GET/PUT/DELETE /markers/:id`, nearby_markers в ответе CREATE, view_count только для автора, запрет обновления истёкших меток
+- [x] `cmd/server/main.go` — wire-up MarkerRepo + MarkerHandler, роуты
+
+**Файлы:**
+```
+backend/internal/domain/marker.go        (новый)
+backend/internal/repository/marker.go    (новый)
+backend/internal/handler/marker.go       (новый)
+backend/internal/middleware/auth.go      (OptionalAuth добавлен)
+backend/cmd/server/main.go               (marker routes)
+```
+
+**Ветка:** `feature/TASK-2.2` → merged into `main`
+
+---
+
+### [TASK-3.1] Подписки
+
+**Микрозадачи:**
+- [x] `internal/domain/subscription.go` — Subscription: UserID, TargetCardID?, TargetUserID?
+- [x] `internal/repository/subscription.go` — Create, FindByID, FindByUserAndCard, FindByUserAndTargetUser, FindByUser, Delete, IncrementSubscriberCount, DecrementSubscriberCount
+- [x] `internal/handler/subscription.go` — `POST /subscriptions` (проверка public карты, дедупликация, нельзя на себя), `DELETE /subscriptions/:id` (декремент subscriber_count), `GET /me/subscriptions` (раздельно: карты и юзеры)
+- [x] `cmd/server/main.go` — wire-up SubRepo + SubHandler, роуты
+
+**Файлы:**
+```
+backend/internal/domain/subscription.go        (новый)
+backend/internal/repository/subscription.go    (новый)
+backend/internal/handler/subscription.go       (новый)
+backend/cmd/server/main.go                     (subscription routes)
+```
+
+**Ветка:** `feature/TASK-3.1` → merged into `main`
+
+---
+
+### [TASK-5.4] Управление картами UI
+
+**Микрозадачи:**
+- [x] `src/api/cards.ts` — cardsApi: listPublic, listByOwner, getById, create, update, delete; типы Card, CreateCardPayload
+- [x] `src/store/cards.ts` — useCardsStore (Zustand): myCards[], fetchMyCards, createCard, deleteCard
+- [x] `src/pages/MyCardsPage.tsx` — страница `/my-cards`: список карт, статусы (публичная/приватная), inline-удаление с подтверждением, спиннер/ошибка
+- [x] `src/components/Cards/CreateCardModal.tsx` — модальная форма: title, description, public/private toggle, валидация
+- [x] `src/pages/CardPage.tsx` — страница `/cards/:id`: sidebar список меток + Leaflet карта с маркерами
+- [x] `src/App.tsx` — роуты `/my-cards` и `/cards/:id`
+
+**Файлы:**
+```
+frontend/src/api/cards.ts                         (новый)
+frontend/src/store/cards.ts                       (новый)
+frontend/src/components/Cards/CreateCardModal.tsx (новый)
+frontend/src/pages/MyCardsPage.tsx                (новый)
+frontend/src/pages/CardPage.tsx                   (новый)
+frontend/src/App.tsx                              (обновлён)
+```
+
+**Ветка:** `feature/TASK-5.4` → merged into `main`

@@ -14,8 +14,8 @@
   },
 
   "active_agents": {
-    "backend": "agent-backend-1",
-    "frontend": "agent-frontend-1",
+    "backend": null,
+    "frontend": null,
     "ops": null
   },
 
@@ -125,14 +125,14 @@
       "title": "Markers CRUD",
       "epic": "EPIC-2",
       "agent": "backend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": ["TASK-2.1"],
       "agent_instance": "agent-backend-1",
       "started_at": "2026-05-05T14:00:00Z",
-      "done_at": null,
-      "merged_at": null,
+      "done_at": "2026-05-05T15:30:00Z",
+      "merged_at": "2026-05-05T15:30:00Z",
       "branch": "feature/TASK-2.2",
-      "progress_notes": null,
+      "progress_notes": "done: domain/marker.go (PostGIS, pq.StringArray, ENUMs), repository/marker.go (raw SQL INSERT с ST_MakePoint, cursor pagination, FindNearby, soft delete, marker_count), handler/marker.go (POST/GET /cards/:id/markers, GET/PUT/DELETE /markers/:id, nearby_markers, view_count для автора), OptionalAuth MW",
       "error": null
     },
     "TASK-2.3": {
@@ -210,14 +210,14 @@
       "title": "Подписки",
       "epic": "EPIC-3",
       "agent": "backend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": ["TASK-2.1"],
       "agent_instance": "agent-backend-1",
       "started_at": "2026-05-05T14:00:00Z",
-      "done_at": null,
-      "merged_at": null,
+      "done_at": "2026-05-05T15:30:00Z",
+      "merged_at": "2026-05-05T15:30:00Z",
       "branch": "feature/TASK-3.1",
-      "progress_notes": null,
+      "progress_notes": "done: domain/subscription.go, repository/subscription.go, handler/subscription.go (POST /subscriptions, DELETE /subscriptions/:id, GET /me/subscriptions), проверка public карты, дедупликация, subscriber_count инкремент/декремент",
       "error": null
     },
     "TASK-3.2": {
@@ -394,14 +394,14 @@
       "title": "Управление картами UI",
       "epic": "EPIC-5",
       "agent": "frontend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": ["TASK-5.3", "TASK-2.1"],
       "agent_instance": "agent-frontend-1",
       "started_at": "2026-05-05T14:00:00Z",
-      "done_at": null,
-      "merged_at": null,
+      "done_at": "2026-05-05T15:30:00Z",
+      "merged_at": "2026-05-05T15:30:00Z",
       "branch": "feature/TASK-5.4",
-      "progress_notes": null,
+      "progress_notes": "done: api/cards.ts (CRUD), store/cards.ts (Zustand), MyCardsPage /my-cards (список + удаление), CreateCardModal (title/description/public toggle), CardPage /cards/:id (Leaflet + sidebar меток), App.tsx роуты",
       "error": null
     },
     "TASK-5.5": {
