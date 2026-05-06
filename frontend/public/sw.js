@@ -31,8 +31,8 @@ self.addEventListener('push', (event) => {
   const title = data.title ?? 'Geo-Alert'
   const options = {
     body: data.body ?? '',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
+    icon: '/icons/icon-192.svg',
+    badge: '/icons/icon-192.svg',
     data: { url: data.url ?? '/' },
   }
   event.waitUntil(self.registration.showNotification(title, options))
