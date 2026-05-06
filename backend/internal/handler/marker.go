@@ -339,6 +339,12 @@ func (h *MarkerHandler) GetMarker(c *gin.Context) {
 		}
 	}
 
+	// Draft markers are only visible to their author.
+	if marker.IsDraft && (!authenticated || *callerID != marker.CreatedBy) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		return
+	}
+
 	c.JSON(http.StatusOK, markerResponse(marker, callerID))
 }
 
@@ -385,6 +391,10 @@ func (h *MarkerHandler) UpdateMarker(c *gin.Context) {
 
 	if len(req.Images) > 5 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "max 5 images"})
+		return
+	}
+	if len(req.Tags) > 5 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "max 5 tags"})
 		return
 	}
 
@@ -434,17 +444,42 @@ func (h *MarkerHandler) DeleteMarker(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "marker not found"})
 		return
 	}
-	if marker.CreatedBy != userID {
+	isAuthor := marker.CreatedBy == userID
+
+	// Card owner may also delete any marker on their card.
+	isCardOwner := false
+	if !isAuthor {
+		card, err := h.cards.FindByID(marker.CardID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
+			return
+		}
+		if card != nil && card.OwnerID == userID {
+			isCardOwner = true
+		}
+	}
+
+	if !isAuthor && !isCardOwner {
 		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 
-	if err := h.markers.Delete(id, userID); err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
-		return
-	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
-		return
+	if isAuthor {
+		if err := h.markers.Delete(id, userID); err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		} else if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
+			return
+		}
+	} else {
+		if err := h.markers.DeleteByID(id); err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "marker not found"})
+			return
+		} else if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
+			return
+		}
 	}
 
 	if !marker.IsDraft {

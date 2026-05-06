@@ -152,6 +152,20 @@ func (r *MarkerRepo) Delete(id uuid.UUID, createdBy uuid.UUID) error {
 		Update("deleted_at", now).Error
 }
 
+// DeleteByID soft-deletes a marker regardless of created_by (used by card owner).
+func (r *MarkerRepo) DeleteByID(id uuid.UUID) error {
+	result := r.db.Model(&domain.Marker{}).
+		Where("id = ? AND deleted_at IS NULL", id).
+		Update("deleted_at", time.Now())
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
 func (r *MarkerRepo) IncrementViewCount(id uuid.UUID) error {
 	return r.db.Model(&domain.Marker{}).
 		Where("id = ? AND deleted_at IS NULL", id).
