@@ -12,9 +12,21 @@
     "mock_api_spec": "tasks/mock-api.yaml"
   },
   "active_agents": {
-    "backend": null,
-    "frontend": null,
-    "ops": null
+    "backend": {
+      "agent_id": "agent-backend-13",
+      "started_at": "2026-05-06T15:30:00Z",
+      "last_heartbeat_at": "2026-05-06T15:30:00Z"
+    },
+    "frontend": {
+      "agent_id": "agent-frontend-10",
+      "started_at": "2026-05-06T15:30:00Z",
+      "last_heartbeat_at": "2026-05-06T15:30:00Z"
+    },
+    "ops": {
+      "agent_id": "agent-ops-4",
+      "started_at": "2026-05-06T15:30:00Z",
+      "last_heartbeat_at": "2026-05-06T15:30:00Z"
+    }
   },
   "tasks": {
     "TASK-1.1": {
@@ -859,6 +871,48 @@
       "merged_at": "2026-05-06T15:00:00Z",
       "branch": "feature/TASK-6.7",
       "progress_notes": "done: vite.config.ts exclude e2e/**; npm install @testing-library/dom; .eslintrc.cjs з argsIgnorePattern ^_; eslint-disable у MarkerPin/Toast/MapView (react-refresh); eslint-disable-next-line у MarkerDetailDrawer (exhaustive-deps x2). lint: 0 errors 0 warnings. tests: 17 pass. build: OK.",
+      "error": null
+    },
+    "TASK-7.1": {
+      "title": "Audit backend: проблемы, тесты, готовность к деплою",
+      "epic": "EPIC-6",
+      "agent": "backend",
+      "status": "in_progress",
+      "depends_on": [],
+      "agent_instance": "agent-backend-13",
+      "started_at": "2026-05-06T15:30:00Z",
+      "done_at": null,
+      "merged_at": null,
+      "branch": "feature/TASK-7.1",
+      "progress_notes": "started: go build, go vet, go test, проверка конфигов, миграций, env vars",
+      "error": null
+    },
+    "TASK-7.2": {
+      "title": "Audit frontend: проблемы, тесты, готовность к деплою",
+      "epic": "EPIC-6",
+      "agent": "frontend",
+      "status": "in_progress",
+      "depends_on": [],
+      "agent_instance": "agent-frontend-10",
+      "started_at": "2026-05-06T15:30:00Z",
+      "done_at": null,
+      "merged_at": null,
+      "branch": "feature/TASK-7.2",
+      "progress_notes": "started: npm build, lint, vitest, playwright config, env vars",
+      "error": null
+    },
+    "TASK-7.3": {
+      "title": "Audit ops: Docker, CI/CD, конфиги, готовность к деплою",
+      "epic": "EPIC-6",
+      "agent": "ops",
+      "status": "in_progress",
+      "depends_on": [],
+      "agent_instance": "agent-ops-4",
+      "started_at": "2026-05-06T15:30:00Z",
+      "done_at": null,
+      "merged_at": null,
+      "branch": "feature/TASK-7.3",
+      "progress_notes": "started: docker-compose lint, dockerfile check, CI yaml, .env coverage, secrets scan",
       "error": null
     }
   }
