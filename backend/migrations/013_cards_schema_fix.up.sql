@@ -1,0 +1,11 @@
+ALTER TABLE cards
+    ADD COLUMN IF NOT EXISTS is_public   BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN IF NOT EXISTS ttl_hours   INT     NOT NULL DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS view_count  BIGINT  NOT NULL DEFAULT 0;
+
+UPDATE cards SET is_public = (privacy = 'PUBLIC') WHERE privacy IS NOT NULL;
+
+ALTER TABLE cards
+    DROP COLUMN IF EXISTS privacy,
+    DROP COLUMN IF EXISTS allow_contributors,
+    DROP COLUMN IF EXISTS timezone;
