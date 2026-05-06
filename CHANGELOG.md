@@ -1114,3 +1114,44 @@ frontend/src/__tests__/useTtlCountdown.test.tsx
 ```
 
 **Гілка:** `feature/TASK-6.2-A` → merged into `main`
+
+---
+
+## Сессия N — 2026-05-06 · агент: ops
+
+---
+
+### [TASK-6.5] Deployment — CI/CD pipeline + production конфиги
+
+**Микрозадачи:**
+- [x] **6.5.1** `.github/workflows/ci.yml` — два параллельных job-а: `backend` (go vet + go build + go test) и `frontend` (npm ci + npm run build + npm test / vitest). Кеш Go modules через `actions/setup-go@v5` с `cache-dependency-path`, кеш npm через `actions/setup-node@v4`.
+- [x] **6.5.2** `.github/workflows/deploy.yml` — деплой на push в main. Option A: SSH deploy через `appleboy/ssh-action` (git pull + docker compose up --build + migrate). Option B: Docker Hub push (закомментировано). Список необходимых секретов задокументирован в комментариях файла: `SERVER_HOST`, `SERVER_USER`, `SSH_PRIVATE_KEY`, `DB_PASSWORD`, `AUTH_JWT_SECRET`, `AUTH_GOOGLE_CLIENT_ID`, `AUTH_GOOGLE_CLIENT_SECRET`.
+- [x] **6.5.3** `frontend/Dockerfile` — multi-stage: `node:20-alpine` (builder: npm ci + npm run build) → `nginx:alpine` (serve dist/). SPA fallback через nginx.conf.
+- [x] **6.5.4** `frontend/nginx.conf` — SPA fallback (`try_files $uri $uri/ /index.html`), gzip сжатие, immutable cache для статических ассетов, no-cache для `sw.js`.
+- [x] **6.5.5** `docker-compose.prod.yml` — сервисы: postgres (postgis:16), backend, frontend/nginx. Убран adminer. `restart: always`. Network isolation: `internal` (postgres↔backend, без доступа с хоста), `external` (backend↔frontend). Volume для postgres_data.
+- [x] **6.5.6** `frontend/.dockerignore` — исключены: node_modules, dist, .env*, логи, IDE файлы.
+- [x] **6.5.7** Проверка секретов: `grep -r "password|secret|private_key|api_key"` по `backend/internal/` и `frontend/src/`. Найдено 7 совпадений — все являются именами полей структур или параметрами функций, значения берутся исключительно из ENV переменных. Хардкода секретов нет.
+
+**Результат проверки секретов:**
+```
+backend/internal/auth/jwt.go: поле struct secret []byte — значение из ENV
+backend/internal/auth/jwt.go: NewJWTService(secret string) — параметр, значение из ENV
+backend/internal/auth/jwt.go: token.SignedString(j.secret) — использование поля
+backend/internal/auth/jwt.go: return j.secret, nil — использование поля
+backend/internal/auth/google.go: "client_secret": {g.clientSecret} — значение из ENV
+backend/internal/config/config.go: "password=%s" — DSN строка, значение из ENV
+```
+Реальных секретов в коде не обнаружено.
+
+**Файлы:**
+```
+.github/workflows/ci.yml
+.github/workflows/deploy.yml
+frontend/Dockerfile
+frontend/nginx.conf
+frontend/.dockerignore
+docker-compose.prod.yml
+tasks/BOARD.json              (TASK-6.5 status: merged)
+```
+
+**Ветка:** `feature/TASK-6.5` → merged into `main`

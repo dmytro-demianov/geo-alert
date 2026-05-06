@@ -563,7 +563,7 @@
       "title": "Deployment",
       "epic": "EPIC-6",
       "agent": "ops",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-1.2",
         "TASK-6.1",
@@ -571,12 +571,12 @@
         "TASK-6.3",
         "TASK-6.4"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-ops-2",
+      "started_at": "2026-05-06T12:00:00Z",
+      "done_at": "2026-05-06T13:00:00Z",
+      "merged_at": "2026-05-06T13:00:00Z",
+      "branch": "feature/TASK-6.5",
+      "progress_notes": "done: .github/workflows/ci.yml (backend Go + frontend Node параллельно, кеш модулей), .github/workflows/deploy.yml (SSH deploy + Option B Docker Hub заглушка, список секретів), frontend/Dockerfile (multi-stage node:20-alpine→nginx:alpine), frontend/nginx.conf (SPA fallback, gzip, immutable cache), frontend/.dockerignore, docker-compose.prod.yml (postgres/postgis, backend, frontend/nginx, network isolation internal/external, restart:always, без adminer). Перевірка секретів: усі значення беруться з ENV, хардкоду немає.",
       "error": null
     },
     "TASK-4.1-A": {

@@ -1,0 +1,76 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+# Required secrets (configure in GitHub repo Settings → Secrets and variables → Actions):
+#   SERVER_HOST       — IP or hostname of the production server
+#   SERVER_USER       — SSH username (e.g. ubuntu, deploy)
+#   SSH_PRIVATE_KEY   — private SSH key for authentication
+#   DB_PASSWORD       — production Postgres password
+#   AUTH_JWT_SECRET   — production JWT secret (min 32 chars)
+#   AUTH_GOOGLE_CLIENT_ID      — Google OAuth client ID
+#   AUTH_GOOGLE_CLIENT_SECRET  — Google OAuth client secret
+
+jobs:
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    needs: []  # uncomment "ci" here once CI workflow is stable: needs: [ci]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # Option A: SSH deploy — copy files and restart Docker Compose
+      # -----------------------------------------------------------------------
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /opt/geo-alert
+
+            # Pull latest code
+            git pull origin main
+
+            # Write production env (values come from server-side .env or CI secrets)
+            # In production, .env is managed manually on the server, not via CI.
+
+            # Rebuild and restart services
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+
+            # Run DB migrations
+            docker compose -f docker-compose.prod.yml exec -T backend ./geo-alert migrate || true
+
+            echo "Deploy complete"
+
+      # -----------------------------------------------------------------------
+      # Option B: Docker Hub push (alternative to Option A — comment out A above)
+      # Additional secrets needed: DOCKERHUB_USERNAME, DOCKERHUB_TOKEN
+      # -----------------------------------------------------------------------
+      # - name: Log in to Docker Hub
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      #
+      # - name: Build and push backend image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: ./backend
+      #     push: true
+      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/geo-alert-backend:latest
+      #
+      # - name: Build and push frontend image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: ./frontend
+      #     push: true
+      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/geo-alert-frontend:latest

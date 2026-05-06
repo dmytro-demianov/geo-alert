@@ -1,0 +1,74 @@
+version: '3.9'
+
+# Production docker-compose.
+# Before running:
+#   1. Create .env file on server with all required variables (see .env.example).
+#   2. Ensure SERVER_ENV=production in .env.
+#   3. Run: docker compose -f docker-compose.prod.yml up -d --build
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: geo-alert-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: geo-alert-backend
+    restart: always
+    env_file: .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      SERVER_ENV: production
+    expose:
+      - "8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal
+      - external
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: geo-alert-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - external
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  # internal: backend ↔ postgres, not exposed to host
+  internal:
+    driver: bridge
+    internal: true
+  # external: frontend ↔ backend, accessible from host
+  external:
+    driver: bridge
