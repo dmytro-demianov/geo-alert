@@ -1196,3 +1196,22 @@ frontend/src/pages/UserProfilePage.tsx    (добавлены data-testid)
 frontend/package.json                     (добавлен test:e2e скрипт, @playwright/test в devDependencies)
 tasks/BOARD.json                          (TASK-6.2-B status: merged)
 ```
+
+---
+
+### [TASK-6.6] .gitignore — покриття env, build артефактів, Playwright, Firebase — ops
+
+**Мікрозадачі:**
+- [x] Root `.gitignore` — додано `.env`, `docker-compose.override.yml`, `*.log`, `.idea/`, `.vscode/`
+- [x] `frontend/.gitignore` — додано `playwright-report/`, `test-results/`, `.playwright/`, `*.tsbuildinfo`
+- [x] `backend/.gitignore` — додано `bin/`, `*.out`, `coverage.html`, `*service-account*.json`, `firebase-adminsdk*.json`
+- [x] Перевірено: `.env` не в репо, захардкоджених секретів немає
+
+**Файли:**
+```
+.gitignore
+frontend/.gitignore
+backend/.gitignore
+```
+
+**Гілка:** `feature/TASK-6.6` → merged into `main`

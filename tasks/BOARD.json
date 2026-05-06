@@ -12,8 +12,8 @@
     "mock_api_spec": "tasks/mock-api.yaml"
   },
   "active_agents": {
-    "backend": "agent-backend-12",
-    "frontend": "agent-frontend-7",
+    "backend": null,
+    "frontend": null,
     "ops": null
   },
   "tasks": {
@@ -813,6 +813,22 @@
       "merged_at": "2026-05-06T13:00:00Z",
       "branch": "feature/TASK-6.2-B",
       "progress_notes": "done: @playwright/test installed, playwright.config.ts, e2e/cards.spec.ts (4 tests), e2e/markers.spec.ts (5 tests), e2e/subscription.spec.ts (5 tests), e2e/helpers/auth.ts. Added data-testid to MyCardsPage, CreateCardModal, CreateMarkerModal, UserProfilePage. Added /my-cards and /cards/:id routes to App.tsx. Added test:e2e script to package.json.",
+      "error": null
+    },
+    "TASK-6.6": {
+      "title": ".gitignore — покриття env, build артефактів, Playwright, Firebase",
+      "epic": "EPIC-6",
+      "agent": "ops",
+      "status": "merged",
+      "depends_on": [
+        "TASK-6.5"
+      ],
+      "agent_instance": "agent-ops-3",
+      "started_at": "2026-05-06T13:30:00Z",
+      "done_at": "2026-05-06T13:35:00Z",
+      "merged_at": "2026-05-06T13:35:00Z",
+      "branch": "feature/TASK-6.6",
+      "progress_notes": "done: root .gitignore (розширено: .env, docker-compose.override.yml, .idea/, .vscode/, *.log); frontend/.gitignore (playwright-report/, test-results/, .playwright/, *.tsbuildinfo); backend/.gitignore (bin/, *.out, coverage.html, *service-account*.json, firebase-adminsdk*.json). Перевірено: .env не в репо, firebase-ключі виключено.",
       "error": null
     }
   }
