@@ -125,7 +125,7 @@ export default function CardPage() {
   const [selected, setSelected] = useState<MarkerData | null>(null)
   const [drawerMarker, setDrawerMarker] = useState<MarkerData | null>(null)
   const [pendingLocation, setPendingLocation] = useState<PendingLocation | null>(null)
-  const isOwner = card !== null && user !== null && card.owner_id === user.id
+  const isOwner = card !== null && !!user?.id && card.owner_id === user.id
   // Keep a stable ref to avoid re-renders in MapClickHandler
   const isOwnerRef = useRef(isOwner)
   isOwnerRef.current = isOwner

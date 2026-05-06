@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { useMap } from 'react-leaflet'
+import L from 'leaflet'
 import Icon from './ui/Icon'
+import { ZoomControls } from './Map/MapView'
 
 interface MapControlsProps {
   onLocate: () => void
   onThemeChange?: (theme: MapTheme) => void
+  mapRef: React.MutableRefObject<L.Map | null>
 }
 
 type MapTheme = 'light' | 'dark' | 'satellite'
@@ -15,33 +17,13 @@ const themes: Array<{ key: MapTheme; label: string; color: string; url: string }
   { key: 'satellite', label: 'Супутник', color: '#3F4A3A', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' },
 ]
 
-function ZoomControls() {
-  const map = useMap()
-  return (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-md overflow-hidden">
-      <button
-        onClick={() => map.zoomIn()}
-        className="w-10 h-10 flex items-center justify-center text-slate-700 hover:bg-slate-50 border-b border-slate-100 transition-colors"
-      >
-        <Icon name="plus" size={18} />
-      </button>
-      <button
-        onClick={() => map.zoomOut()}
-        className="w-10 h-10 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors"
-      >
-        <span className="text-xl font-light leading-none">−</span>
-      </button>
-    </div>
-  )
-}
-
-export default function MapControls({ onLocate, onThemeChange }: MapControlsProps) {
+export default function MapControls({ onLocate, onThemeChange, mapRef }: MapControlsProps) {
   const [theme, setTheme] = useState<MapTheme>('light')
   const [layerOpen, setLayerOpen] = useState(false)
 
   return (
-    <div className="absolute right-5 top-1/2 -translate-y-1/2 z-[90] flex flex-col gap-2">
-      <ZoomControls />
+    <div className="absolute right-5 top-1/2 -translate-y-1/2 z-[400] flex flex-col gap-2">
+      <ZoomControls mapRef={mapRef} />
 
       <button
         onClick={onLocate}

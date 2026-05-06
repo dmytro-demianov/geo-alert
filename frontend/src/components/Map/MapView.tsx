@@ -6,6 +6,7 @@ import { MapContainer, TileLayer, CircleMarker, Tooltip, Marker, useMap } from '
 import { renderToStaticMarkup } from 'react-dom/server'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import MarkerPin from '@/components/ui/MarkerPin'
+import Icon from '@/components/ui/Icon'
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -49,6 +50,7 @@ interface MapViewProps {
   markers?: MapMarkerData[]
   onMarkerClick?: (id: string) => void
   locateTrigger?: number
+  mapRef?: React.MutableRefObject<L.Map | null>
 }
 
 function LocateControl({ trigger }: { trigger?: number }) {
@@ -66,49 +68,69 @@ function LocateControl({ trigger }: { trigger?: number }) {
   return null
 }
 
-export default function MapView({ theme = 'light', markers = [], onMarkerClick, locateTrigger }: MapViewProps) {
-  const { position, loading } = useGeolocation()
+function MapRefCapture({ mapRef }: { mapRef?: React.MutableRefObject<L.Map | null> }) {
+  const map = useMap()
+  useEffect(() => {
+    if (mapRef) mapRef.current = map
+  }, [map, mapRef])
+  return null
+}
+
+export default function MapView({ theme = 'light', markers = [], onMarkerClick, locateTrigger, mapRef }: MapViewProps) {
+  const { position } = useGeolocation()
 
   return (
-    <div className="relative w-full h-full">
-      {loading && (
-        <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-white/60 pointer-events-none">
-          <div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
-        </div>
+    <MapContainer
+      center={position ?? DEFAULT_CENTER}
+      zoom={DEFAULT_ZOOM}
+      style={{ width: '100%', height: '100%' }}
+      zoomControl={false}
+    >
+      <TileLayer key={theme} url={TILE_URLS[theme]} attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' />
+      <LocateControl trigger={locateTrigger} />
+      <MapRefCapture mapRef={mapRef} />
+
+      {position && (
+        <CircleMarker
+          center={position}
+          radius={9}
+          pathOptions={{ color: '#EF4444', fillColor: '#EF4444', fillOpacity: 0.85, weight: 2 }}
+        >
+          <Tooltip permanent direction="top" offset={[0, -12]}>
+            <span className="text-xs font-medium">Ви тут</span>
+          </Tooltip>
+        </CircleMarker>
       )}
 
-      <MapContainer
-        center={position ?? DEFAULT_CENTER}
-        zoom={DEFAULT_ZOOM}
-        style={{ width: '100%', height: '100%' }}
-        zoomControl={false}
+      {markers.map((m) => (
+        <Marker
+          key={m.id}
+          position={[m.lat, m.lon]}
+          icon={createHeatIcon(m.like_weight)}
+          eventHandlers={{ click: () => onMarkerClick?.(m.id) }}
+        >
+          <Tooltip direction="top" offset={[0, -38]}>{m.title}</Tooltip>
+        </Marker>
+      ))}
+    </MapContainer>
+  )
+}
+
+export function ZoomControls({ mapRef }: { mapRef: React.MutableRefObject<L.Map | null> }) {
+  return (
+    <div className="bg-white rounded-lg border border-slate-200 shadow-md overflow-hidden">
+      <button
+        onClick={() => mapRef.current?.zoomIn()}
+        className="w-10 h-10 flex items-center justify-center text-slate-700 hover:bg-slate-50 border-b border-slate-100 transition-colors"
       >
-        <TileLayer key={theme} url={TILE_URLS[theme]} attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' />
-        <LocateControl trigger={locateTrigger} />
-
-        {position && (
-          <CircleMarker
-            center={position}
-            radius={9}
-            pathOptions={{ color: '#EF4444', fillColor: '#EF4444', fillOpacity: 0.85, weight: 2 }}
-          >
-            <Tooltip permanent direction="top" offset={[0, -12]}>
-              <span className="text-xs font-medium">Ви тут</span>
-            </Tooltip>
-          </CircleMarker>
-        )}
-
-        {markers.map((m) => (
-          <Marker
-            key={m.id}
-            position={[m.lat, m.lon]}
-            icon={createHeatIcon(m.like_weight)}
-            eventHandlers={{ click: () => onMarkerClick?.(m.id) }}
-          >
-            <Tooltip direction="top" offset={[0, -38]}>{m.title}</Tooltip>
-          </Marker>
-        ))}
-      </MapContainer>
+        <Icon name="plus" size={18} />
+      </button>
+      <button
+        onClick={() => mapRef.current?.zoomOut()}
+        className="w-10 h-10 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors"
+      >
+        <span className="text-xl font-light leading-none">−</span>
+      </button>
     </div>
   )
 }
