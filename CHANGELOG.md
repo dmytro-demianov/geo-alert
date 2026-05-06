@@ -1215,3 +1215,25 @@ backend/.gitignore
 ```
 
 **Гілка:** `feature/TASK-6.6` → merged into `main`
+
+---
+
+### [TASK-5.12] Frontend: leaflet deps, vite-env.d.ts, VITE_* env vars — frontend
+
+**Мікрозадачі:**
+- [x] `npm install leaflet react-leaflet@4 @types/leaflet` — пакети були відсутні в package.json
+- [x] `src/vite-env.d.ts` — типи для `import.meta.env` (VITE_GOOGLE_CLIENT_ID, VITE_GOOGLE_REDIRECT_URI)
+- [x] `frontend/.env.example` — документація VITE_* змінних
+- [x] `.env.example` — додано секцію Frontend VITE_* змінних
+- [x] `npm run build`: OK — 190 модулів, 0 TS помилок
+
+**Файли:**
+```
+frontend/package.json
+frontend/package-lock.json
+frontend/src/vite-env.d.ts
+frontend/.env.example
+.env.example
+```
+
+**Гілка:** `feature/TASK-5.12` → merged into `main`
