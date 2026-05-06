@@ -13,13 +13,14 @@ import (
 )
 
 type LikeHandler struct {
-	likes   *repository.LikeRepo
-	markers *repository.MarkerRepo
-	wsHub   *ws.Manager
+	likes     likeStore
+	markers   markerStore
+	wsHub     wsHub
+	notifRepo notifStore
 }
 
-func NewLikeHandler(likes *repository.LikeRepo, markers *repository.MarkerRepo, wsHub *ws.Manager) *LikeHandler {
-	return &LikeHandler{likes: likes, markers: markers, wsHub: wsHub}
+func NewLikeHandler(likes *repository.LikeRepo, markers *repository.MarkerRepo, hub *ws.Manager, notifRepo *repository.NotificationRepo) *LikeHandler {
+	return &LikeHandler{likes: likes, markers: markers, wsHub: hub, notifRepo: notifRepo}
 }
 
 func (h *LikeHandler) broadcastLikeUpdate(markerID uuid.UUID, likeWeight int) {
@@ -131,6 +132,24 @@ func (h *LikeHandler) ToggleLike(c *gin.Context) {
 	action := "liked"
 	if likeType == domain.LikeTypeDislike {
 		action = "disliked"
+	}
+
+	if likeType == domain.LikeTypeLike && marker.CreatedBy != userID {
+		notif := &domain.Notification{
+			ID:              uuid.New(),
+			UserID:          marker.CreatedBy,
+			Type:            domain.NotifNewLike,
+			RelatedMarkerID: &marker.ID,
+			Message:         "Хтось поставив лайк на вашу мітку",
+		}
+		if err := h.notifRepo.Create(notif); err == nil {
+			if msg, err := json.Marshal(map[string]any{
+				"type":         "new_notification",
+				"notification": notif,
+			}); err == nil {
+				h.wsHub.SendToUser(notif.UserID, msg)
+			}
+		}
 	}
 
 	h.broadcastLikeUpdate(markerID, weight)

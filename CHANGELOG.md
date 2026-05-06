@@ -1062,3 +1062,55 @@ Makefile
 ```
 
 **Гілка:** `feature/TASK-1.2` → merged into `main`
+
+---
+
+### [TASK-6.1] Тесты Backend — backend
+
+**Мікрозадачі:**
+- [x] TASK-6.1.1 — Unit тесты handlers: cards (8 тестів), likes (5), comments (6)
+- [x] TASK-6.1.2 — Unit тест `ExtractMentions` (7 кейсів: згадка, два UUID, без згадок, короткий UUID тощо)
+- [x] Введено інтерфейси (`likeStore`, `markerStore`, `cardStore`, `commentStore`, `notifStore`, `wsHub`) — handlers більше не залежать від конкретних repo-типів
+- [x] 26 тестів проходять, 0 fail
+
+**Файли:**
+```
+backend/internal/handler/interfaces.go    (нові інтерфейси)
+backend/internal/handler/like.go          (struct поля → interfaces)
+backend/internal/handler/comment.go       (struct поля → interfaces)
+backend/internal/handler/card.go          (struct поля → interfaces)
+backend/internal/handler/mocks_test.go    (mock реалізації)
+backend/internal/handler/card_handler_test.go
+backend/internal/handler/like_handler_test.go
+backend/internal/handler/comment_handler_test.go
+backend/internal/repository/comment_test.go
+```
+
+**Гілка:** `feature/TASK-6.1` → merged into `main`
+
+---
+
+### [TASK-6.2-A] Тести Frontend: Unit (Vitest) — frontend
+
+**Мікрозадачі:**
+- [x] TASK-6.2.1 — Встановлено vitest@4 + @testing-library/react + jsdom
+- [x] `vite.config.ts` — додано блок `test` (globals, jsdom, setupFiles)
+- [x] `src/hooks/useTtlCountdown.ts` — виокремлено з MarkerDetailDrawer/CardPage + виправлено баг (expired=false для вже-прострочених маркерів)
+- [x] `heatColor.test.ts` — 5 кейсів: негативна вага, neutral, yellow, orange, red
+- [x] `formatTtl.test.ts` — 7 кейсів: 0ms, від'ємний, секунди, хвилини, години, дні+години
+- [x] `useTtlCountdown.test.tsx` — 5 кейсів: ETERNAL, expired, critical, not-critical, tick update
+- [x] 17 тестів проходять, 0 fail
+
+**Файли:**
+```
+frontend/package.json                           (vitest + testing-library)
+frontend/vite.config.ts                         (test block)
+frontend/tsconfig.json                          (types: vitest/globals)
+frontend/src/test/setup.ts
+frontend/src/hooks/useTtlCountdown.ts           (extracted + bugfix)
+frontend/src/__tests__/heatColor.test.ts
+frontend/src/__tests__/formatTtl.test.ts
+frontend/src/__tests__/useTtlCountdown.test.tsx
+```
+
+**Гілка:** `feature/TASK-6.2-A` → merged into `main`

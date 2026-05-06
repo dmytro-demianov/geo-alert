@@ -16,19 +16,21 @@ import (
 )
 
 type CommentHandler struct {
-	comments *repository.CommentRepo
-	markers  *repository.MarkerRepo
-	cards    *repository.CardRepo
-	wsHub    *ws.Manager
+	comments  commentStore
+	markers   markerStore
+	cards     cardStore
+	wsHub     wsHub
+	notifRepo notifStore
 }
 
 func NewCommentHandler(
 	comments *repository.CommentRepo,
 	markers *repository.MarkerRepo,
 	cards *repository.CardRepo,
-	wsHub *ws.Manager,
+	hub *ws.Manager,
+	notifRepo *repository.NotificationRepo,
 ) *CommentHandler {
-	return &CommentHandler{comments: comments, markers: markers, cards: cards, wsHub: wsHub}
+	return &CommentHandler{comments: comments, markers: markers, cards: cards, wsHub: hub, notifRepo: notifRepo}
 }
 
 func commentResponse(c *domain.Comment) gin.H {
@@ -135,7 +137,46 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 		return
 	}
 
-	// TODO: send notification to marker author and mentioned users (TASK-4.4)
+	if marker.CreatedBy != userID {
+		notif := &domain.Notification{
+			ID:              uuid.New(),
+			UserID:          marker.CreatedBy,
+			Type:            domain.NotifNewComment,
+			RelatedMarkerID: &marker.ID,
+			Message:         "Новий коментар на вашій мітці",
+		}
+		if err := h.notifRepo.Create(notif); err == nil {
+			if msg, err := json.Marshal(map[string]any{
+				"type":         "new_notification",
+				"notification": notif,
+			}); err == nil {
+				h.wsHub.SendToUser(notif.UserID, msg)
+			}
+		}
+	}
+
+	for _, mentionStr := range comment.Mentions {
+		mentionedUserID, err := uuid.Parse(mentionStr)
+		if err != nil || mentionedUserID == userID {
+			continue
+		}
+		notif := &domain.Notification{
+			ID:              uuid.New(),
+			UserID:          mentionedUserID,
+			Type:            domain.NotifNewMention,
+			RelatedMarkerID: &marker.ID,
+			RelatedUserID:   &userID,
+			Message:         "Вас згадали в коментарі",
+		}
+		if err := h.notifRepo.Create(notif); err == nil {
+			if msg, err := json.Marshal(map[string]any{
+				"type":         "new_notification",
+				"notification": notif,
+			}); err == nil {
+				h.wsHub.SendToUser(notif.UserID, msg)
+			}
+		}
+	}
 
 	if msg, err := json.Marshal(map[string]any{
 		"type":      "new_comment",
