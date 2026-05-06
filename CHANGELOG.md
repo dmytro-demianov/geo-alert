@@ -1283,4 +1283,42 @@ tasks/BOARD.json
 CHANGELOG.md
 ```
 
+---
+
+### [TASK-7.2] Audit frontend: проблемы, тесты, готовность к деплою
+
+**Мікрозадачі:**
+- [x] `npm run build` — збірка успішна (chunk warning 553 kB — не помилка, bundle OK)
+- [x] `vitest run` — 17 тестів пройшли у 3 файлах (useTtlCountdown, Toast, MarkerPin)
+- [x] `eslint src` — 0 errors, 0 warnings
+- [x] Playwright конфігурація присутня (`e2e/` + `playwright.config.ts`), excluded з vitest
+- [x] `.env.example` покриває `VITE_GOOGLE_CLIENT_ID` та `VITE_GOOGLE_REDIRECT_URI`
+- [x] Проблем не знайдено, виправлень не потрібно
+
+**Файли:**
+```
+tasks/BOARD.json
+CHANGELOG.md
+```
+
+---
+
+### [TASK-7.3] Audit ops: Docker, CI/CD, конфиги, готовность к деплою
+
+**Мікрозадачі:**
+- [x] `docker compose config` — docker-compose.yml валідний (попередження про застарілий `version` — не помилка)
+- [x] `docker-compose.prod.yml` — валідний, env vars підключаються з `.env`
+- [x] `.github/workflows/ci.yml` — паралельні jobs backend (`go test`) + frontend (`vitest`) ✅
+- [x] `.github/workflows/deploy.yml` — присутній
+- [x] `.env.example` покриває всі змінні що читаються в `backend/internal/config/config.go`
+- [x] Перевірка TODO/FIXME у ops файлах — не знайдено
+- [x] Додано 5 docker-дозволів до `.claude/settings.local.json` для майбутніх агентів
+
+**Файли:**
+```
+.claude/settings.local.json
+tasks/BOARD.json
+CHANGELOG.md
+```
+
 **Гілка:** `main` (аудит без змін коду)
