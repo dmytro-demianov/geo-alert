@@ -12,7 +12,11 @@
     "mock_api_spec": "tasks/mock-api.yaml"
   },
   "active_agents": {
-    "backend": null,
+    "backend": {
+      "agent_id": "agent-backend-17",
+      "started_at": "2026-05-06T20:00:00Z",
+      "last_heartbeat_at": "2026-05-06T20:00:00Z"
+    },
     "frontend": null,
     "ops": null
   },
@@ -907,13 +911,13 @@
       "title": "Fix P1: card owner удаляет чужие метки; черновики закрыты; tags валидация в update",
       "epic": "EPIC-9",
       "agent": "backend",
-      "status": "todo",
+      "status": "in_progress",
       "depends_on": ["TASK-9.1"],
-      "agent_instance": null,
-      "started_at": null,
+      "agent_instance": "agent-backend-17",
+      "started_at": "2026-05-06T20:00:00Z",
       "done_at": null,
       "merged_at": null,
-      "branch": null,
+      "branch": "feature/TASK-9.2",
       "progress_notes": null,
       "error": null
     },
