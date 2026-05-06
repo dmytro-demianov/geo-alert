@@ -12,11 +12,7 @@
     "mock_api_spec": "tasks/mock-api.yaml"
   },
   "active_agents": {
-    "backend": {
-      "agent_id": "agent-backend-14",
-      "started_at": "2026-05-06T17:00:00Z",
-      "last_heartbeat_at": "2026-05-06T17:00:00Z"
-    },
+    "backend": null,
     "frontend": null,
     "ops": null
   },
@@ -897,14 +893,14 @@
       "title": "Entity Schema: объединённая схема сущностей (связи, валидация)",
       "epic": "EPIC-8",
       "agent": "backend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": [],
       "agent_instance": "agent-backend-14",
       "started_at": "2026-05-06T17:00:00Z",
-      "done_at": null,
-      "merged_at": null,
+      "done_at": "2026-05-06T17:30:00Z",
+      "merged_at": "2026-05-06T17:30:00Z",
       "branch": "feature/TASK-8.1",
-      "progress_notes": null,
+      "progress_notes": "done: docs/ENTITY_SCHEMA.md — 12 сущностей, граф FK, CHECK/UNIQUE constraints, правила валидации handler-уровня, индексы (базовые + оптимизационные), денормализованные счётчики.",
       "error": null
     },
     "TASK-7.3": {
