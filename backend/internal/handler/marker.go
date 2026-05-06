@@ -20,11 +20,12 @@ import (
 type MarkerHandler struct {
 	markers *repository.MarkerRepo
 	cards   *repository.CardRepo
+	blocks  *repository.BlockRepo
 	storage *storage.Client
 }
 
-func NewMarkerHandler(markers *repository.MarkerRepo, cards *repository.CardRepo, storageClient *storage.Client) *MarkerHandler {
-	return &MarkerHandler{markers: markers, cards: cards, storage: storageClient}
+func NewMarkerHandler(markers *repository.MarkerRepo, cards *repository.CardRepo, blocks *repository.BlockRepo, storageClient *storage.Client) *MarkerHandler {
+	return &MarkerHandler{markers: markers, cards: cards, blocks: blocks, storage: storageClient}
 }
 
 type createMarkerRequest struct {
@@ -325,6 +326,14 @@ func (h *MarkerHandler) GetMarker(c *gin.Context) {
 
 	if !card.IsPublic {
 		if !authenticated || *callerID != card.OwnerID {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
+	}
+
+	// Block check: card owner may have blocked caller
+	if authenticated && *callerID != card.OwnerID {
+		if blocked, err := h.blocks.IsBlocked(card.OwnerID, *callerID); err == nil && blocked {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}

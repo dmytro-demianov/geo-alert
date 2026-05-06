@@ -14,11 +14,12 @@ import (
 )
 
 type CardHandler struct {
-	cards cardStore
+	cards  cardStore
+	blocks *repository.BlockRepo
 }
 
-func NewCardHandler(cards *repository.CardRepo) *CardHandler {
-	return &CardHandler{cards: cards}
+func NewCardHandler(cards *repository.CardRepo, blocks *repository.BlockRepo) *CardHandler {
+	return &CardHandler{cards: cards, blocks: blocks}
 }
 
 type createCardRequest struct {
@@ -142,14 +143,22 @@ func (h *CardHandler) GetCard(c *gin.Context) {
 	}
 
 	// If private — only owner can view
+	rawUserID, callerExists := c.Get("user_id")
+	var callerID uuid.UUID
+	if callerExists {
+		callerID = rawUserID.(uuid.UUID)
+	}
+
 	if !card.IsPublic {
-		rawUserID, exists := c.Get("user_id")
-		if !exists {
+		if !callerExists || callerID != card.OwnerID {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
-		userID := rawUserID.(uuid.UUID)
-		if userID != card.OwnerID {
+	}
+
+	// Block check: owner may have blocked caller
+	if callerExists && callerID != card.OwnerID {
+		if blocked, err := h.blocks.IsBlocked(card.OwnerID, callerID); err == nil && blocked {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}

@@ -14,10 +14,11 @@ type UserHandler struct {
 	users  *repository.UserRepo
 	cards  *repository.CardRepo
 	tokens *repository.RefreshTokenRepo
+	blocks *repository.BlockRepo
 }
 
-func NewUserHandler(users *repository.UserRepo, cards *repository.CardRepo, tokens *repository.RefreshTokenRepo) *UserHandler {
-	return &UserHandler{users: users, cards: cards, tokens: tokens}
+func NewUserHandler(users *repository.UserRepo, cards *repository.CardRepo, tokens *repository.RefreshTokenRepo, blocks *repository.BlockRepo) *UserHandler {
+	return &UserHandler{users: users, cards: cards, tokens: tokens, blocks: blocks}
 }
 
 // POST /users/me/fcm-token
@@ -151,6 +152,17 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 			"deleted":      true,
 		})
 		return
+	}
+
+	// Block check: target user may have blocked caller
+	if callerVal, exists := c.Get("user_id"); exists {
+		callerID := callerVal.(uuid.UUID)
+		if callerID != user.ID {
+			if blocked, err := h.blocks.IsBlocked(user.ID, callerID); err == nil && blocked {
+				c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+				return
+			}
+		}
 	}
 
 	cardCount, _ := h.cards.CountPublicByOwner(id)
