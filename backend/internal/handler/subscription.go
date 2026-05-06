@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -91,6 +92,10 @@ func (h *SubscriptionHandler) Subscribe(c *gin.Context) {
 			return
 		}
 		_ = h.subs.IncrementSubscriberCount(cardID)
+
+		if card.OwnerID != userID {
+			go h.notifyNewSubscriber(card.OwnerID, cardID, userID)
+		}
 	} else {
 		targetUserID, err := uuid.Parse(*req.TargetUserID)
 		if err != nil {
@@ -116,6 +121,25 @@ func (h *SubscriptionHandler) Subscribe(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, subResponse(sub))
+}
+
+func (h *SubscriptionHandler) notifyNewSubscriber(ownerID, cardID, subscriberID uuid.UUID) {
+	notif := &domain.Notification{
+		ID:            uuid.New(),
+		UserID:        ownerID,
+		Type:          domain.NotifNewSubscriber,
+		RelatedCardID: &cardID,
+		RelatedUserID: &subscriberID,
+		Message:       "Новий підписник на вашу карту",
+	}
+	if err := h.notifRepo.Create(notif); err == nil {
+		if msg, err := json.Marshal(map[string]any{
+			"type":         "new_notification",
+			"notification": notif,
+		}); err == nil {
+			h.wsHub.SendToUser(notif.UserID, msg)
+		}
+	}
 }
 
 // DELETE /subscriptions/:id

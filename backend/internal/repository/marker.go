@@ -193,3 +193,16 @@ func (r *MarkerRepo) SoftDeleteExpired(ids []uuid.UUID) (int64, error) {
 	return result.RowsAffected, result.Error
 }
 
+func (r *MarkerRepo) FindImagesByCardID(cardID uuid.UUID) ([]string, error) {
+	var markers []domain.Marker
+	err := r.db.Select("images").Where("card_id = ? AND deleted_at IS NULL", cardID).Find(&markers).Error
+	if err != nil {
+		return nil, err
+	}
+	var all []string
+	for _, m := range markers {
+		all = append(all, m.Images...)
+	}
+	return all, nil
+}
+

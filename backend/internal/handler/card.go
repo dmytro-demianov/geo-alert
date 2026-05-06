@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"unicode/utf8"
@@ -11,15 +13,38 @@ import (
 
 	"github.com/dmytro-demianov/geo-alert/internal/domain"
 	"github.com/dmytro-demianov/geo-alert/internal/repository"
+	"github.com/dmytro-demianov/geo-alert/internal/ws"
+	"github.com/dmytro-demianov/geo-alert/pkg/storage"
 )
 
 type CardHandler struct {
-	cards  cardStore
-	blocks *repository.BlockRepo
+	cards     cardStore
+	blocks    *repository.BlockRepo
+	markers   *repository.MarkerRepo
+	subs      *repository.SubscriptionRepo
+	notifRepo *repository.NotificationRepo
+	wsHub     *ws.Manager
+	storage   *storage.Client
 }
 
-func NewCardHandler(cards *repository.CardRepo, blocks *repository.BlockRepo) *CardHandler {
-	return &CardHandler{cards: cards, blocks: blocks}
+func NewCardHandler(
+	cards *repository.CardRepo,
+	blocks *repository.BlockRepo,
+	markers *repository.MarkerRepo,
+	subs *repository.SubscriptionRepo,
+	notifRepo *repository.NotificationRepo,
+	wsHub *ws.Manager,
+	storageClient *storage.Client,
+) *CardHandler {
+	return &CardHandler{
+		cards:     cards,
+		blocks:    blocks,
+		markers:   markers,
+		subs:      subs,
+		notifRepo: notifRepo,
+		wsHub:     wsHub,
+		storage:   storageClient,
+	}
 }
 
 type createCardRequest struct {
@@ -242,6 +267,8 @@ func (h *CardHandler) UpdateCard(c *gin.Context) {
 		return
 	}
 
+	wasPublic := card.IsPublic
+
 	card.Title = req.Title
 	card.Description = req.Description
 	if req.IsPublic != nil {
@@ -252,6 +279,11 @@ func (h *CardHandler) UpdateCard(c *gin.Context) {
 	if err := h.cards.Update(card); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "db error"})
 		return
+	}
+
+	// Notify subscribers when card goes from public to private
+	if wasPublic && !card.IsPublic {
+		go h.notifyCardPrivate(card.ID)
 	}
 
 	c.JSON(http.StatusOK, cardResponse(card))
@@ -267,6 +299,12 @@ func (h *CardHandler) DeleteCard(c *gin.Context) {
 
 	userID := c.MustGet("user_id").(uuid.UUID)
 
+	// Collect marker images before deletion for async cleanup
+	var images []string
+	if h.storage != nil && h.markers != nil {
+		images, _ = h.markers.FindImagesByCardID(id)
+	}
+
 	err = h.cards.Delete(id, userID)
 	if err == gorm.ErrRecordNotFound {
 		// Either not found or not owner — return 403 to avoid leaking existence
@@ -278,5 +316,37 @@ func (h *CardHandler) DeleteCard(c *gin.Context) {
 		return
 	}
 
+	if h.storage != nil && len(images) > 0 {
+		go h.storage.DeletePhotos(context.Background(), images)
+	}
+
 	c.JSON(http.StatusOK, gin.H{"ok": true})
+}
+
+func (h *CardHandler) notifyCardPrivate(cardID uuid.UUID) {
+	if h.subs == nil || h.notifRepo == nil || h.wsHub == nil {
+		return
+	}
+	subs, err := h.subs.FindByCardID(cardID)
+	if err != nil || len(subs) == 0 {
+		return
+	}
+	for i := range subs {
+		sub := &subs[i]
+		notif := &domain.Notification{
+			ID:            uuid.New(),
+			UserID:        sub.UserID,
+			Type:          domain.NotifCardPrivate,
+			RelatedCardID: &cardID,
+			Message:       "Карта, на яку ви підписані, стала приватною",
+		}
+		if err := h.notifRepo.Create(notif); err == nil {
+			if msg, err := json.Marshal(map[string]any{
+				"type":         "new_notification",
+				"notification": notif,
+			}); err == nil {
+				h.wsHub.SendToUser(notif.UserID, msg)
+			}
+		}
+	}
 }

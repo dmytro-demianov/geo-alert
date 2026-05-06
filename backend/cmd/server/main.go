@@ -78,7 +78,7 @@ func main() {
 	notifService := service.NewNotificationService(fcmClient, cooldownRepo, userRepo)
 
 	authHandler := handler.NewAuthHandler(googleOAuth, jwtSvc, userRepo, tokenRepo)
-	cardHandler := handler.NewCardHandler(cardRepo, blockRepo)
+	cardHandler := handler.NewCardHandler(cardRepo, blockRepo, markerRepo, subRepo, notifRepo, wsManager, storageClient)
 	markerHandler := handler.NewMarkerHandler(markerRepo, cardRepo, blockRepo, storageClient)
 	uploadHandler := handler.NewUploadHandler(storageClient)
 	subHandler := handler.NewSubscriptionHandler(subRepo, cardRepo, wsManager, notifRepo)
