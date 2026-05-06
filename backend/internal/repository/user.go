@@ -17,7 +17,7 @@ func NewUserRepo(db *gorm.DB) *UserRepo {
 
 func (r *UserRepo) FindByGoogleID(googleID string) (*domain.User, error) {
 	var user domain.User
-	err := r.db.Where("google_id = ?", googleID).First(&user).Error
+	err := r.db.Where("google_id = ? AND deleted_at IS NULL", googleID).First(&user).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, nil
 	}
@@ -26,7 +26,7 @@ func (r *UserRepo) FindByGoogleID(googleID string) (*domain.User, error) {
 
 func (r *UserRepo) FindByID(id uuid.UUID) (*domain.User, error) {
 	var user domain.User
-	err := r.db.First(&user, "id = ?", id).Error
+	err := r.db.First(&user, "id = ? AND deleted_at IS NULL", id).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, nil
 	}
