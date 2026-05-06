@@ -46,6 +46,12 @@ func (r *SubscriptionRepo) FindByUserAndTargetUser(userID, targetUserID uuid.UUI
 	return &sub, err
 }
 
+func (r *SubscriptionRepo) FindByCardID(cardID uuid.UUID) ([]domain.Subscription, error) {
+	var subs []domain.Subscription
+	err := r.db.Where("target_card_id = ?", cardID).Find(&subs).Error
+	return subs, err
+}
+
 func (r *SubscriptionRepo) FindByUser(userID uuid.UUID) ([]domain.Subscription, error) {
 	var subs []domain.Subscription
 	err := r.db.Where("user_id = ?", userID).Order("created_at DESC").Find(&subs).Error
