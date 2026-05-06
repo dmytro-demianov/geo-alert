@@ -1237,3 +1237,28 @@ frontend/.env.example
 ```
 
 **Гілка:** `feature/TASK-5.12` → merged into `main`
+
+---
+
+### [TASK-6.7] Fix: vitest exclude e2e, @testing-library/dom, eslint config — frontend
+
+**Мікрозадачі:**
+- [x] `vite.config.ts` — додано `exclude: ['e2e/**']` щоб Playwright тести не потрапляли у Vitest
+- [x] `npm install @testing-library/dom` — відсутня транзитивна залежність
+- [x] `.eslintrc.cjs` — створено конфіг; правило `no-unused-vars` з `argsIgnorePattern: ^_`
+- [x] `eslint-disable react-refresh/only-export-components` у MarkerPin, Toast, MapView
+- [x] `eslint-disable-next-line react-hooks/exhaustive-deps` у MarkerDetailDrawer (2 useEffect)
+- [x] Результат: `lint` 0 errors/warnings, `test` 17 pass, `build` OK
+
+**Файли:**
+```
+frontend/vite.config.ts
+frontend/.eslintrc.cjs
+frontend/package.json / package-lock.json
+frontend/src/components/ui/MarkerPin.tsx
+frontend/src/components/Toast.tsx
+frontend/src/components/Map/MapView.tsx
+frontend/src/components/MarkerDetailDrawer.tsx
+```
+
+**Гілка:** `feature/TASK-6.7` → merged into `main`

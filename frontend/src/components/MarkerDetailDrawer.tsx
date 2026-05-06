@@ -497,12 +497,18 @@ export default function MarkerDetailDrawer({ marker, isOwner = false, onClose }:
   const [reportOpen, setReportOpen] = useState(false)
   const [localCommentCount, setLocalCommentCount] = useState<number>(marker?.comment_count ?? 0)
 
+  // Reset local optimistic state when a different marker is opened.
+  // Intentionally omit like_weight/comment_count — adding them would overwrite
+  // optimistic updates on every server push.
   useEffect(() => {
     setLocalWeight(marker?.like_weight ?? 0)
     setUserVote(null)
     setLocalCommentCount(marker?.comment_count ?? 0)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marker?.id])
 
+  // Re-subscribe WS handler when marker changes. marker?.id is the only
+  // meaningful dependency — marker object reference may differ between renders.
   useEffect(() => {
     if (!marker) return
     const handler = (data: unknown) => {
@@ -513,6 +519,7 @@ export default function MarkerDetailDrawer({ marker, isOwner = false, onClose }:
     }
     wsClient.on('like_update', handler)
     return () => wsClient.off('like_update', handler)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marker?.id])
 
   async function handleVote(type: LikeType) {

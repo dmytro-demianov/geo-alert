@@ -846,6 +846,20 @@
       "branch": "feature/TASK-5.12",
       "progress_notes": "done: npm install leaflet react-leaflet@4 @types/leaflet; src/vite-env.d.ts (VITE_GOOGLE_CLIENT_ID, VITE_GOOGLE_REDIRECT_URI); frontend/.env.example; .env.example оновлено. npm run build: OK, 190 модулів, 0 TS помилок.",
       "error": null
+    },
+    "TASK-6.7": {
+      "title": "Fix: vitest exclude e2e, @testing-library/dom, eslint config",
+      "epic": "EPIC-6",
+      "agent": "frontend",
+      "status": "merged",
+      "depends_on": ["TASK-6.2-A", "TASK-6.2-B"],
+      "agent_instance": "agent-frontend-9",
+      "started_at": "2026-05-06T14:30:00Z",
+      "done_at": "2026-05-06T15:00:00Z",
+      "merged_at": "2026-05-06T15:00:00Z",
+      "branch": "feature/TASK-6.7",
+      "progress_notes": "done: vite.config.ts exclude e2e/**; npm install @testing-library/dom; .eslintrc.cjs з argsIgnorePattern ^_; eslint-disable у MarkerPin/Toast/MapView (react-refresh); eslint-disable-next-line у MarkerDetailDrawer (exhaustive-deps x2). lint: 0 errors 0 warnings. tests: 17 pass. build: OK.",
+      "error": null
     }
   }
 }
