@@ -12,11 +12,7 @@
     "mock_api_spec": "tasks/mock-api.yaml"
   },
   "active_agents": {
-    "backend": {
-      "agent_id": "agent-backend-17",
-      "started_at": "2026-05-06T20:00:00Z",
-      "last_heartbeat_at": "2026-05-06T20:00:00Z"
-    },
+    "backend": null,
     "frontend": null,
     "ops": null
   },
@@ -911,14 +907,14 @@
       "title": "Fix P1: card owner удаляет чужие метки; черновики закрыты; tags валидация в update",
       "epic": "EPIC-9",
       "agent": "backend",
-      "status": "in_progress",
+      "status": "merged",
       "depends_on": ["TASK-9.1"],
       "agent_instance": "agent-backend-17",
       "started_at": "2026-05-06T20:00:00Z",
-      "done_at": null,
-      "merged_at": null,
+      "done_at": "2026-05-06T20:20:00Z",
+      "merged_at": "2026-05-06T20:20:00Z",
       "branch": "feature/TASK-9.2",
-      "progress_notes": null,
+      "progress_notes": "done: MarkerRepo.DeleteByID добавлен; DeleteMarker проверяет card owner; GetMarker блокирует черновики для не-автора (403); UpdateMarker валидирует tags max 5. build OK, все тесты pass.",
       "error": null
     },
     "TASK-9.3": {
