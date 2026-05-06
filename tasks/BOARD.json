@@ -803,16 +803,16 @@
       "title": "Тести: E2E (Playwright) — створення картки/метки, підписка",
       "epic": "EPIC-6",
       "agent": "frontend",
-      "status": "todo",
+      "status": "merged",
       "depends_on": [
         "TASK-6.2-A"
       ],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "agent_instance": "agent-frontend-7",
+      "started_at": "2026-05-06T12:00:00Z",
+      "done_at": "2026-05-06T13:00:00Z",
+      "merged_at": "2026-05-06T13:00:00Z",
+      "branch": "feature/TASK-6.2-B",
+      "progress_notes": "done: @playwright/test installed, playwright.config.ts, e2e/cards.spec.ts (4 tests), e2e/markers.spec.ts (5 tests), e2e/subscription.spec.ts (5 tests), e2e/helpers/auth.ts. Added data-testid to MyCardsPage, CreateCardModal, CreateMarkerModal, UserProfilePage. Added /my-cards and /cards/:id routes to App.tsx. Added test:e2e script to package.json.",
       "error": null
     }
   }

@@ -1155,3 +1155,44 @@ tasks/BOARD.json              (TASK-6.5 status: merged)
 ```
 
 **Ветка:** `feature/TASK-6.5` → merged into `main`
+
+---
+
+## [TASK-6.2-B] E2E тесты с Playwright — создание карточки, метки, подписка
+
+**Дата:** 2026-05-06
+**Ветка:** `feature/TASK-6.2-B` → merged into `main`
+
+### Выполненные микрозадачи:
+
+- [x] Установлен `@playwright/test` (добавлен в devDependencies)
+- [x] Создан `frontend/playwright.config.ts` — baseURL: http://localhost:3000, webServer: npm run dev, проект: chromium
+- [x] Создан `frontend/e2e/helpers/auth.ts` — хелпер для мокирования auth-состояния через `page.addInitScript()` (Zustand persist key: `geo-alert-auth`)
+- [x] Создан `frontend/e2e/cards.spec.ts` — 4 теста: пустой список, открытие модалки, создание карточки + появление в списке, блокировка кнопки без заголовка
+- [x] Создан `frontend/e2e/markers.spec.ts` — 5 тестов: загрузка страницы карты, пустой список меток, взаимодействие с картой, форма метки, появление метки в списке после создания
+- [x] Создан `frontend/e2e/subscription.spec.ts` — 5 тестов: профиль пользователя, публичные карты, кнопка Subscribe, смена статуса Subscribe→Подписан, отписка, скрытие кнопки на своём профиле
+- [x] Добавлен `data-testid` атрибуты в компоненты:
+  - `MyCardsPage`: `create-card-btn`, `card-item`, `card-title`
+  - `CreateCardModal`: `create-card-form`, `card-title-input`, `create-card-submit`
+  - `CreateMarkerModal`: `create-marker-form`, `marker-title-input`, `create-marker-submit`
+  - `UserProfilePage`: `subscribe-btn`, `unsubscribe-btn`
+- [x] Добавлены маршруты `/my-cards` и `/cards/:id` в `App.tsx` (они отсутствовали в роутере)
+- [x] Добавлен скрипт `"test:e2e": "playwright test"` в `package.json`
+- [x] Все API запросы мокируются через `page.route()` — реальный backend не нужен
+
+### Созданные / изменённые файлы:
+
+```
+frontend/playwright.config.ts             (новый)
+frontend/e2e/helpers/auth.ts              (новый)
+frontend/e2e/cards.spec.ts                (новый — 4 теста)
+frontend/e2e/markers.spec.ts              (новый — 5 тестов)
+frontend/e2e/subscription.spec.ts         (новый — 5 тестов)
+frontend/src/App.tsx                      (добавлены импорты MyCardsPage/CardPage и маршруты)
+frontend/src/pages/MyCardsPage.tsx        (добавлены data-testid)
+frontend/src/components/Cards/CreateCardModal.tsx  (добавлены data-testid)
+frontend/src/components/CreateMarkerModal.tsx      (добавлены data-testid)
+frontend/src/pages/UserProfilePage.tsx    (добавлены data-testid)
+frontend/package.json                     (добавлен test:e2e скрипт, @playwright/test в devDependencies)
+tasks/BOARD.json                          (TASK-6.2-B status: merged)
+```

@@ -158,6 +158,7 @@ export default function UserProfilePage() {
             <div className="flex gap-3 mt-5">
               {isFollowing ? (
                 <button
+                  data-testid="unsubscribe-btn"
                   onClick={handleUnfollow}
                   disabled={actionLoading}
                   className="btn-secondary flex-1"
@@ -173,6 +174,7 @@ export default function UserProfilePage() {
                 </button>
               ) : (
                 <button
+                  data-testid="subscribe-btn"
                   onClick={handleFollow}
                   disabled={actionLoading}
                   className="btn-primary flex-1"

@@ -260,7 +260,7 @@ export default function CreateMarkerModal({
         </div>
 
         {/* Scrollable form body */}
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+        <form data-testid="create-marker-form" onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
             {/* Title */}
             <div>
@@ -268,6 +268,7 @@ export default function CreateMarkerModal({
                 Название <span className="text-red-500">*</span>
               </label>
               <input
+                data-testid="marker-title-input"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -473,6 +474,7 @@ export default function CreateMarkerModal({
               Отмена
             </button>
             <button
+              data-testid="create-marker-submit"
               type="submit"
               disabled={!title.trim() || submitting}
               className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"

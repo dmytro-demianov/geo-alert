@@ -8,6 +8,8 @@ import UserProfilePage from '@/pages/UserProfilePage'
 import BlockedSettingsPage from '@/pages/BlockedSettingsPage'
 import FeedPage from '@/pages/FeedPage'
 import SearchPage from '@/pages/SearchPage'
+import MyCardsPage from '@/pages/MyCardsPage'
+import CardPage from '@/pages/CardPage'
 import { ToastContainer } from '@/components/Toast'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { useAuthStore } from '@/store/auth'
@@ -56,6 +58,8 @@ export default function App() {
           <Route path="/settings/blocked" element={<BlockedSettingsPage />} />
           <Route path="/feed" element={<FeedPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/my-cards" element={<MyCardsPage />} />
+          <Route path="/cards/:id" element={<CardPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

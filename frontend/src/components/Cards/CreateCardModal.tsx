@@ -33,10 +33,11 @@ export default function CreateCardModal({ onClose, onCreate }: Props) {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
         <h2 className="text-xl font-semibold mb-4">Новая карта</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form data-testid="create-card-form" onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Название *</label>
             <input
+              data-testid="card-title-input"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -80,6 +81,7 @@ export default function CreateCardModal({ onClose, onCreate }: Props) {
               Отмена
             </button>
             <button
+              data-testid="create-card-submit"
               type="submit"
               disabled={!title.trim() || submitting}
               className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"

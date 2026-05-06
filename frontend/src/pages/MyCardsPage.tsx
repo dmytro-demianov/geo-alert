@@ -10,13 +10,13 @@ function CardItem({ card, onDelete }: { card: Card; onDelete: (id: string) => vo
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+    <div data-testid="card-item" className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between gap-3">
         <div
           className="flex-1 min-w-0 cursor-pointer"
           onClick={() => navigate(`/cards/${card.id}`)}
         >
-          <h3 className="font-semibold text-gray-900 truncate">{card.title}</h3>
+          <h3 data-testid="card-title" className="font-semibold text-gray-900 truncate">{card.title}</h3>
           {card.description && (
             <p className="text-sm text-gray-500 mt-1 line-clamp-2">{card.description}</p>
           )}
@@ -78,6 +78,7 @@ export default function MyCardsPage() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Мои карты</h1>
           <button
+            data-testid="create-card-btn"
             onClick={() => setShowCreate(true)}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
           >
