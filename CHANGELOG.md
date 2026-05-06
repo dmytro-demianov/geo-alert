@@ -1262,3 +1262,25 @@ frontend/src/components/MarkerDetailDrawer.tsx
 ```
 
 **Гілка:** `feature/TASK-6.7` → merged into `main`
+
+---
+
+### [TASK-7.1] Аудит backend: компіляція, тести, конфіги, міграції, роутер
+
+**Мікрозадачі:**
+- [x] `go build ./...` — компіляція пройшла без помилок
+- [x] `go vet ./...` — статичний аналіз без попереджень
+- [x] `go test ./... -v -timeout 60s` — всі тести пройшли: 20 тестів у `internal/handler`, 7 у `internal/repository`
+- [x] Перевірка TODO/FIXME/HACK/XXX у handler файлах — не знайдено жодного
+- [x] Перевірка env-змінних з `.env.example` — всі змінні (SERVER_PORT, SERVER_ENV, CORS_ALLOWED_ORIGINS, DB_*, AUTH_*, FIREBASE_*, TTL_WORKER_INTERVAL_MINUTES, FCM_CLEANUP_INTERVAL_HOURS, RATE_LIMIT_*) використовуються в `config.go`
+- [x] Перевірка міграцій — 001-012 без пропусків (001...012, up+down для кожного)
+- [x] Перевірка `main.go` — всі handlers зареєстровані в роутері (auth, cards, markers, users, subscriptions, feed, notifications, blocks, ws, search, upload, location)
+- [x] Проблем не знайдено, виправлень не потрібно
+
+**Файли:**
+```
+tasks/BOARD.json
+CHANGELOG.md
+```
+
+**Гілка:** `main` (аудит без змін коду)
