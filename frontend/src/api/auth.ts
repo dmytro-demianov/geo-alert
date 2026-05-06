@@ -2,13 +2,14 @@ import { apiClient } from './client'
 import type { AuthResponse } from './types'
 
 export async function exchangeCodeForTokens(code: string): Promise<AuthResponse> {
-  const { data } = await apiClient.post<AuthResponse>('/auth/google', { code })
+  const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI as string
+  const { data } = await apiClient.post<AuthResponse>('/auth/google', { code, redirect_uri: redirectUri })
   return data
 }
 
 export async function fetchMe(): Promise<AuthResponse['user']> {
-  const { data } = await apiClient.get<{ user: AuthResponse['user'] }>('/auth/me')
-  return data.user
+  const { data } = await apiClient.get<AuthResponse['user']>('/auth/me')
+  return data
 }
 
 export async function logoutRequest(): Promise<void> {
