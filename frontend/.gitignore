@@ -2,6 +2,16 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Environment
 .env
 .env.*
 !.env.example
+
+# Playwright
+playwright-report/
+test-results/
+.playwright/
+
+# TypeScript build
+*.tsbuildinfo

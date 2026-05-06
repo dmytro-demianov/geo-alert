@@ -1,4 +1,17 @@
+# Environment
 .env
 *.env.local
+
+# Build output
+bin/
 geo-alert
+*.exe
+
+# Test cache & coverage
 /tmp/
+*.out
+coverage.html
+
+# Firebase service account (содержит приватный ключ)
+*service-account*.json
+firebase-adminsdk*.json
