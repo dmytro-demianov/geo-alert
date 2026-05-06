@@ -852,7 +852,10 @@
       "epic": "EPIC-6",
       "agent": "frontend",
       "status": "merged",
-      "depends_on": ["TASK-6.2-A", "TASK-6.2-B"],
+      "depends_on": [
+        "TASK-6.2-A",
+        "TASK-6.2-B"
+      ],
       "agent_instance": "agent-frontend-9",
       "started_at": "2026-05-06T14:30:00Z",
       "done_at": "2026-05-06T15:00:00Z",
@@ -894,7 +897,9 @@
       "epic": "EPIC-9",
       "agent": "backend",
       "status": "merged",
-      "depends_on": ["TASK-8.2"],
+      "depends_on": [
+        "TASK-8.2"
+      ],
       "agent_instance": "agent-backend-16",
       "started_at": "2026-05-06T19:00:00Z",
       "done_at": "2026-05-06T19:30:00Z",
@@ -908,7 +913,9 @@
       "epic": "EPIC-9",
       "agent": "backend",
       "status": "merged",
-      "depends_on": ["TASK-9.1"],
+      "depends_on": [
+        "TASK-9.1"
+      ],
       "agent_instance": "agent-backend-17",
       "started_at": "2026-05-06T20:00:00Z",
       "done_at": "2026-05-06T20:20:00Z",
@@ -921,14 +928,16 @@
       "title": "Fix P1: фото меток при удалении карты; CARD_PRIVATE нотификация; NEW_SUBSCRIBER нотификация",
       "epic": "EPIC-9",
       "agent": "backend",
-      "status": "todo",
-      "depends_on": ["TASK-9.1"],
-      "agent_instance": null,
-      "started_at": null,
-      "done_at": null,
-      "merged_at": null,
-      "branch": null,
-      "progress_notes": null,
+      "status": "merged",
+      "depends_on": [
+        "TASK-9.1"
+      ],
+      "agent_instance": "agent-backend-18",
+      "started_at": "2026-05-06T20:30:00Z",
+      "done_at": "2026-05-06T13:18:29Z",
+      "merged_at": "2026-05-06T13:18:29Z",
+      "branch": "feature/TASK-9.3",
+      "progress_notes": "done: FindImagesByCardID, FindByCardID, DeleteCard photo cleanup, UpdateCard CARD_PRIVATE notifications, Subscribe NEW_SUBSCRIBER notification",
       "error": null
     },
     "TASK-8.2": {
@@ -936,7 +945,9 @@
       "epic": "EPIC-8",
       "agent": "backend",
       "status": "merged",
-      "depends_on": ["TASK-8.1"],
+      "depends_on": [
+        "TASK-8.1"
+      ],
       "agent_instance": "agent-backend-15",
       "started_at": "2026-05-06T18:00:00Z",
       "done_at": "2026-05-06T18:45:00Z",
