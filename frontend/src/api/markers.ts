@@ -114,4 +114,10 @@ export const markersApi = {
 
   reportMarker: (markerId: string, reason: ReportReason, comment?: string) =>
     apiClient.post(`/markers/${markerId}/reports`, { reason, comment }),
+
+  uploadPhoto: (file: File) => {
+    const form = new FormData()
+    form.append('photo', file)
+    return apiClient.post<{ url: string }>('/upload/photo', form)
+  },
 }
