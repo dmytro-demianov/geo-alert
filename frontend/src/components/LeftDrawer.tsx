@@ -12,6 +12,7 @@ interface MarkerItem {
   comment_count: number
   dist?: number
   created_at?: string
+  created_by?: string
 }
 
 interface CardItem {
@@ -27,6 +28,7 @@ interface LeftDrawerProps {
   onClose: () => void
   markers?: MarkerItem[]
   cards?: CardItem[]
+  currentUserId?: string
   onOpenMarker?: (marker: MarkerItem) => void
   onOpenCard?: (card: CardItem) => void
   onCreateCard?: () => void
@@ -40,12 +42,17 @@ export default function LeftDrawer({
   onClose,
   markers = [],
   cards = [],
+  currentUserId,
   onOpenMarker,
   onOpenCard,
   onCreateCard,
 }: LeftDrawerProps) {
   const [tab, setTab] = useState<Tab>('markers')
   const [filter, setFilter] = useState<Filter>('all')
+
+  const myMarkers = currentUserId
+    ? markers.filter((m) => m.created_by === currentUserId)
+    : []
 
   const filteredMarkers = markers.filter((m) => {
     if (filter === 'hot') return m.like_weight >= 6
@@ -182,9 +189,33 @@ export default function LeftDrawer({
           )}
 
           {tab === 'mine' && (
-            <div className="p-8 text-center text-slate-400 text-sm">
-              У вас поки немає власних позначок.
-            </div>
+            <>
+              {myMarkers.length === 0 ? (
+                <div className="p-8 text-center text-slate-400 text-sm">
+                  {currentUserId ? 'У вас поки немає власних позначок.' : 'Увійдіть, щоб побачити свої позначки.'}
+                </div>
+              ) : (
+                myMarkers.map((m) => (
+                  <div
+                    key={m.id}
+                    onClick={() => onOpenMarker?.(m)}
+                    className="px-[18px] py-3 flex gap-3 cursor-pointer border-b border-slate-50 hover:bg-slate-50 transition-colors"
+                  >
+                    <MarkerPin weight={m.like_weight} size={28} />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[14px] font-semibold text-slate-900 truncate block">{m.title}</span>
+                      {m.description && (
+                        <div className="text-xs text-slate-500 mt-0.5 truncate">{m.description}</div>
+                      )}
+                      <div className="flex gap-3 mt-1.5 text-slate-400 text-[11px]">
+                        <span>♥ {m.like_weight}</span>
+                        <span>💬 {m.comment_count}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </>
           )}
         </div>
       </div>

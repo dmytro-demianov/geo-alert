@@ -40,7 +40,7 @@ export default function UserProfilePage() {
 
   // Find subscription to one of this user's cards
   const subscriptionForUserCard = subscriptions.find((sub) =>
-    userCards.some((c) => c.id === sub.card_id)
+    userCards.some((c) => c.id === sub.target_card_id)
   )
   const isFollowing = Boolean(subscriptionForUserCard)
 

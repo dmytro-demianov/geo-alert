@@ -52,7 +52,7 @@ export const useSocialStore = create<SocialState>((set, get) => ({
     set({ subscriptionsLoading: true })
     try {
       const { data } = await subscriptionsApi.getMySubscriptions()
-      set({ subscriptions: data.subscriptions ?? [], subscriptionsLoading: false })
+      set({ subscriptions: [...(data.cards ?? []), ...(data.users ?? [])], subscriptionsLoading: false })
     } catch {
       set({ subscriptionsLoading: false })
     }

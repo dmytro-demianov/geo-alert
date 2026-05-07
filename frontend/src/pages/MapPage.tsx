@@ -97,6 +97,7 @@ export default function MapPage() {
           like_weight: m.like_weight,
           comment_count: m.comment_count,
           created_at: m.created_at,
+          created_by: m.created_by,
         }))}
         cards={cards.map((c) => ({
           id: c.id,
@@ -105,6 +106,7 @@ export default function MapPage() {
           subscriber_count: 0,
           privacy: c.is_public ? 'public' : 'private',
         }))}
+        currentUserId={user?.id}
         onOpenMarker={(m) => {
           const marker = markersRef.current.find((x) => x.id === m.id)
           setSelectedMarker(marker ?? null)
