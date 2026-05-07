@@ -122,7 +122,6 @@ export default function CardPage() {
   const [markers, setMarkers] = useState<MarkerData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selected, setSelected] = useState<MarkerData | null>(null)
   const [drawerMarker, setDrawerMarker] = useState<MarkerData | null>(null)
   const [pendingLocation, setPendingLocation] = useState<PendingLocation | null>(null)
   const isOwner = card !== null && !!user?.id && card.owner_id === user.id
@@ -152,7 +151,7 @@ export default function CardPage() {
 
   const handleMarkerCreated = (newMarker: MarkerData) => {
     setMarkers((prev) => [newMarker, ...prev])
-    setSelected(newMarker)
+    setDrawerMarker(newMarker)
     setPendingLocation(null)
   }
 
@@ -182,8 +181,8 @@ export default function CardPage() {
   }
 
   const center: [number, number] =
-    markers.length > 0
-      ? [markers[0].latitude, markers[0].longitude]
+    visibleMarkers.length > 0
+      ? [visibleMarkers[0].latitude, visibleMarkers[0].longitude]
       : [48.45, 34.98]
 
   return (
@@ -231,11 +230,8 @@ export default function CardPage() {
                 <MarkerCard
                   key={m.id}
                   marker={m}
-                  isSelected={selected?.id === m.id}
-                  onClick={() => {
-                    setSelected(m)
-                    setDrawerMarker(m)
-                  }}
+                  isSelected={drawerMarker?.id === m.id}
+                  onClick={() => setDrawerMarker(m)}
                 />
               ))
             )}
@@ -250,13 +246,12 @@ export default function CardPage() {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
             <MapClickHandler onMapClick={handleMapClick} />
-            {markers.map((m) => (
+            {visibleMarkers.map((m) => (
               <Marker
                 key={m.id}
                 position={[m.latitude, m.longitude]}
                 eventHandlers={{
                   click: () => {
-                    setSelected(m)
                     setDrawerMarker(m)
                   },
                 }}

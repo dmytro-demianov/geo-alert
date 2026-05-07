@@ -301,12 +301,15 @@ function CommentsSection({ markerId, allowComments, initialCount, onCountChange 
       .finally(() => setIsLoading(false))
   }, [markerId])
 
-  // WebSocket: receive new comments in real-time
+  // WebSocket: receive new comments in real-time (dedup by id to avoid double-add on own submit)
   useEffect(() => {
     const handler = (data: unknown) => {
       const msg = data as { marker_id: string; comment: Comment }
       if (msg.marker_id === markerId) {
-        setComments((prev) => [msg.comment, ...prev])
+        setComments((prev) => {
+          if (prev.some((c) => c.id === msg.comment.id)) return prev
+          return [msg.comment, ...prev]
+        })
         setCommentCount((prev) => prev + 1)
       }
     }
