@@ -983,6 +983,50 @@
       "branch": "feature/TASK-7.3",
       "progress_notes": "АУДИТ ЗАВЕРШЕНО. docker-compose.yml — валідний (попередження про застарілий version — не помилка). docker-compose.prod.yml — OK (env vars з .env). CI: ci.yml + deploy.yml присутні. .env.example покриває всі змінні з config.go. Додано 5 docker-дозволів до settings.local.json.",
       "error": null
+    },
+    "TASK-10.1": {
+      "title": "MapPage: подключить к API (карты, маркеры, реальный drawer)",
+      "epic": "EPIC-10",
+      "agent": "frontend",
+      "status": "merged",
+      "depends_on": [],
+      "agent_instance": "agent-frontend-11",
+      "started_at": "2026-05-07T07:49:13Z",
+      "done_at": "2026-05-07T07:51:50Z",
+      "merged_at": "2026-05-07T07:51:50Z",
+      "branch": "feature/TASK-10.1",
+      "progress_notes": "Фикс: markers=[] и cards=[] → реальный API; selectedMarker mock → MarkerDetailDrawer; onCreateCard подключить к рефетчу; убрать RightDrawer из MapPage",
+      "error": null
+    },
+    "TASK-10.2": {
+      "title": "CardPage/MarkerDetailDrawer: дубль комментариев, expired маркеры на карте, два стейта",
+      "epic": "EPIC-10",
+      "agent": "frontend",
+      "status": "merged",
+      "depends_on": [
+        "TASK-10.1"
+      ],
+      "agent_instance": "agent-frontend-11",
+      "started_at": "2026-05-07T07:51:50Z",
+      "done_at": "2026-05-07T07:53:11Z",
+      "merged_at": "2026-05-07T07:53:11Z",
+      "branch": null,
+      "progress_notes": null,
+      "error": null
+    },
+    "TASK-10.3": {
+      "title": "LeftDrawer: фильтр recent, кликабельные карточки, дедупликация useTtlCountdown",
+      "epic": "EPIC-10",
+      "agent": "frontend",
+      "status": "merged",
+      "depends_on": [],
+      "agent_instance": "agent-frontend-11",
+      "started_at": "2026-05-07T07:53:11Z",
+      "done_at": "2026-05-07T07:55:31Z",
+      "merged_at": "2026-05-07T07:55:31Z",
+      "branch": null,
+      "progress_notes": null,
+      "error": null
     }
   }
 }
