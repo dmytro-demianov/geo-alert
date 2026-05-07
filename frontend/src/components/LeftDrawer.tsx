@@ -27,6 +27,7 @@ interface LeftDrawerProps {
   markers?: MarkerItem[]
   cards?: CardItem[]
   onOpenMarker?: (marker: MarkerItem) => void
+  onOpenCard?: (card: CardItem) => void
   onCreateCard?: () => void
 }
 
@@ -39,6 +40,7 @@ export default function LeftDrawer({
   markers = [],
   cards = [],
   onOpenMarker,
+  onOpenCard,
   onCreateCard,
 }: LeftDrawerProps) {
   const [tab, setTab] = useState<Tab>('markers')
@@ -152,7 +154,11 @@ export default function LeftDrawer({
                 <div className="py-6 text-center text-slate-400 text-sm">Немає доступних карт</div>
               )}
               {cards.map((c) => (
-                <div key={c.id} className="p-3 border border-slate-100 rounded-lg mb-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                <div
+                  key={c.id}
+                  onClick={() => onOpenCard?.(c)}
+                  className="p-3 border border-slate-100 rounded-lg mb-2 cursor-pointer hover:bg-slate-50 transition-colors"
+                >
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[14px] font-semibold text-slate-900 flex-1">{c.title}</span>
                     <PrivacyBadge value={c.privacy} />
