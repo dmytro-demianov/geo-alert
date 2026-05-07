@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css'
 import { cardsApi, type Card } from '@/api/cards'
 import { markersApi, type MarkerData, type ExpirationType } from '@/api/markers'
 import { useAuthStore } from '@/store/auth'
+import { useTtlCountdown } from '@/hooks/useTtlCountdown'
 import CreateMarkerModal from '@/components/CreateMarkerModal'
 import MarkerDetailDrawer from '@/components/MarkerDetailDrawer'
 
@@ -15,53 +16,6 @@ import MarkerDetailDrawer from '@/components/MarkerDetailDrawer'
 interface PendingLocation {
   latitude: number
   longitude: number
-}
-
-// ---------------------------------------------------------------------------
-// TTL Countdown hook
-// ---------------------------------------------------------------------------
-
-function formatTtl(ms: number): string {
-  if (ms <= 0) return 'Истекла'
-  const totalSec = Math.floor(ms / 1000)
-  const days = Math.floor(totalSec / 86400)
-  const hours = Math.floor((totalSec % 86400) / 3600)
-  const mins = Math.floor((totalSec % 3600) / 60)
-  const secs = totalSec % 60
-
-  if (days > 0) {
-    return `${days}д ${hours}ч`
-  }
-  return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
-}
-
-function useTtlCountdown(
-  expirationType: ExpirationType,
-  expiresAt: string | null,
-): { label: string; expired: boolean; critical: boolean } {
-  const [remaining, setRemaining] = useState<number>(() => {
-    if (expirationType === 'ETERNAL' || !expiresAt) return -1
-    return new Date(expiresAt).getTime() - Date.now()
-  })
-
-  useEffect(() => {
-    if (expirationType === 'ETERNAL' || !expiresAt) return
-    const target = new Date(expiresAt).getTime()
-    const tick = () => setRemaining(target - Date.now())
-    tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [expirationType, expiresAt])
-
-  if (expirationType === 'ETERNAL' || remaining < 0) {
-    return { label: '', expired: false, critical: false }
-  }
-
-  return {
-    label: formatTtl(remaining),
-    expired: remaining <= 0,
-    critical: remaining > 0 && remaining < 10 * 60 * 1000,
-  }
 }
 
 // ---------------------------------------------------------------------------

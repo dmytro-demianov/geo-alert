@@ -1,54 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Icon from './ui/Icon'
 import { heatColor } from './ui/MarkerPin'
-import { type MarkerData, type ExpirationType, type LikeType, type ReportReason, type Comment, markersApi } from '@/api/markers'
+import { type MarkerData, type LikeType, type ReportReason, type Comment, markersApi } from '@/api/markers'
 import { type UserProfile } from '@/api/users'
 import { apiClient } from '@/api/client'
 import { wsClient } from '@/ws/client'
-
-// ---------------------------------------------------------------------------
-// TTL helpers (local, replicating logic from CardPage)
-// ---------------------------------------------------------------------------
-
-function formatTtl(ms: number): string {
-  if (ms <= 0) return 'Истекла'
-  const totalSec = Math.floor(ms / 1000)
-  const days = Math.floor(totalSec / 86400)
-  const hours = Math.floor((totalSec % 86400) / 3600)
-  const mins = Math.floor((totalSec % 3600) / 60)
-  const secs = totalSec % 60
-  if (days > 0) return `${days}д ${hours}ч`
-  return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
-}
-
-function useTtlCountdown(
-  expirationType: ExpirationType,
-  expiresAt: string | null,
-): { label: string; expired: boolean; critical: boolean } {
-  const [remaining, setRemaining] = useState<number>(() => {
-    if (expirationType === 'ETERNAL' || !expiresAt) return -1
-    return new Date(expiresAt).getTime() - Date.now()
-  })
-
-  useEffect(() => {
-    if (expirationType === 'ETERNAL' || !expiresAt) return
-    const target = new Date(expiresAt).getTime()
-    const tick = () => setRemaining(target - Date.now())
-    tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [expirationType, expiresAt])
-
-  if (expirationType === 'ETERNAL' || remaining < 0) {
-    return { label: '', expired: false, critical: false }
-  }
-
-  return {
-    label: formatTtl(remaining),
-    expired: remaining <= 0,
-    critical: remaining > 0 && remaining < 10 * 60 * 1000,
-  }
-}
+import { useTtlCountdown } from '@/hooks/useTtlCountdown'
 
 // ---------------------------------------------------------------------------
 // Time-ago helper

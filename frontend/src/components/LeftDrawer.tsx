@@ -11,6 +11,7 @@ interface MarkerItem {
   like_weight: number
   comment_count: number
   dist?: number
+  created_at?: string
 }
 
 interface CardItem {
@@ -49,6 +50,10 @@ export default function LeftDrawer({
   const filteredMarkers = markers.filter((m) => {
     if (filter === 'hot') return m.like_weight >= 6
     if (filter === 'near') return (m.dist ?? Infinity) <= 500
+    if (filter === 'recent') {
+      if (!m.created_at) return true
+      return Date.now() - new Date(m.created_at).getTime() < 24 * 60 * 60 * 1000
+    }
     return true
   })
 
