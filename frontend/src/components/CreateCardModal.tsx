@@ -5,9 +5,10 @@ import Icon from './ui/Icon'
 
 interface Props {
   onClose: () => void
+  onCreated?: () => void
 }
 
-export default function CreateCardModal({ onClose }: Props) {
+export default function CreateCardModal({ onClose, onCreated }: Props) {
   const navigate = useNavigate()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -29,8 +30,12 @@ export default function CreateCardModal({ onClose }: Props) {
         is_public: isPublic,
       }
       const { data } = await cardsApi.create(payload)
-      onClose()
-      navigate(`/cards/${data.id}`)
+      if (onCreated) {
+        onCreated()
+      } else {
+        onClose()
+        navigate(`/cards/${data.id}`)
+      }
     } catch {
       setError('Не вдалося створити картку. Спробуйте ще раз.')
     } finally {

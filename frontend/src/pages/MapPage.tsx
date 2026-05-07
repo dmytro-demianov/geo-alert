@@ -1,46 +1,67 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import L from 'leaflet'
 import MapView, { MapTheme } from '@/components/Map/MapView'
 import TopBar from '@/components/TopBar'
 import LeftDrawer from '@/components/LeftDrawer'
-import RightDrawer from '@/components/RightDrawer'
+import MarkerDetailDrawer from '@/components/MarkerDetailDrawer'
 import MapControls from '@/components/MapControls'
 import HeatLegend from '@/components/HeatLegend'
 import FAB from '@/components/FAB'
 import CreateCardModal from '@/components/CreateCardModal'
+import { cardsApi, type Card } from '@/api/cards'
+import { markersApi, type MarkerData } from '@/api/markers'
+import { useAuthStore } from '@/store/auth'
 
 export default function MapPage() {
   const mapRef = useRef<L.Map | null>(null)
+  const user = useAuthStore((s) => s.user)
+
   const [createCardOpen, setCreateCardOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null)
   const [mapTheme, setMapTheme] = useState<MapTheme>('light')
   const [locateTrigger, setLocateTrigger] = useState(0)
 
+  const [cards, setCards] = useState<Card[]>([])
+  const [markers, setMarkers] = useState<MarkerData[]>([])
+  const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null)
+
+  // Stable ref to avoid stale closures in map event handlers
+  const markersRef = useRef<MarkerData[]>([])
+  markersRef.current = markers
+
   const handleLocate = useCallback(() => setLocateTrigger((n) => n + 1), [])
 
-  const handleMarkerClick = useCallback((id: string) => {
-    setSelectedMarkerId(id)
+  // Load public cards on mount
+  useEffect(() => {
+    cardsApi.listPublic(50).then((res) => setCards(res.data.cards ?? [])).catch(() => {})
   }, [])
 
-  const handleCloseRight = useCallback(() => setSelectedMarkerId(null), [])
+  // Load markers for a card when selected from LeftDrawer
+  const handleCardOpen = useCallback((cardId: string) => {
+    markersApi.list(cardId, 100)
+      .then((res) => {
+        const list = (res.data.markers ?? []).filter(
+          (m) => !m.is_draft && (m.expiration_type === 'ETERNAL' || !m.expires_at || new Date(m.expires_at).getTime() > Date.now())
+        )
+        setMarkers(list)
+        setSelectedMarker(null)
+      })
+      .catch(() => {})
+  }, [])
 
-  const selectedMarker = selectedMarkerId
-    ? {
-        id: selectedMarkerId,
-        title: 'Золоті ворота',
-        description: 'Пам\'ятник архітектури XI ст. Одна з небагатьох споруд часів Київської Русі.',
-        lat: 50.4501,
-        lon: 30.5234,
-        like_weight: 8,
-        comment_count: 3,
-        view_count: 142,
-        tags: ['архітектура', 'історія', 'туризм'],
-        photos: [],
-        author: { name: 'Дмитро Д.', hue: 0 },
-        ttl_label: '14 д 3 г',
-      }
-    : null
+  // Marker pin click on the map
+  const handleMarkerClick = useCallback((id: string) => {
+    const marker = markersRef.current.find((m) => m.id === id)
+    setSelectedMarker(marker ?? null)
+  }, [])
+
+  // Refetch cards after creating a new one
+  const handleCardCreated = useCallback(() => {
+    setCreateCardOpen(false)
+    cardsApi.listPublic(50).then((res) => setCards(res.data.cards ?? [])).catch(() => {})
+  }, [])
+
+  const isOwner = selectedMarker !== null && !!user?.id && selectedMarker.created_by === user.id
 
   return (
     <div className="relative h-screen w-screen">
@@ -48,7 +69,13 @@ export default function MapPage() {
       <div className="absolute inset-0 isolate">
         <MapView
           theme={mapTheme}
-          markers={[]}
+          markers={markers.map((m) => ({
+            id: m.id,
+            lat: m.latitude,
+            lon: m.longitude,
+            title: m.title,
+            like_weight: m.like_weight,
+          }))}
           onMarkerClick={handleMarkerClick}
           locateTrigger={locateTrigger}
           mapRef={mapRef}
@@ -57,32 +84,50 @@ export default function MapPage() {
 
       <TopBar
         onMenuToggle={() => setDrawerOpen((v) => !v)}
-        onCreateCard={() => {}}
+        onCreateCard={() => setCreateCardOpen(true)}
       />
 
       <LeftDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        markers={[]}
-        cards={[]}
-        onOpenMarker={(m) => setSelectedMarkerId(m.id)}
-        onCreateCard={() => {}}
+        markers={markers.map((m) => ({
+          id: m.id,
+          title: m.title,
+          description: m.description,
+          like_weight: m.like_weight,
+          comment_count: m.comment_count,
+        }))}
+        cards={cards.map((c) => ({
+          id: c.id,
+          title: c.title,
+          marker_count: 0,
+          subscriber_count: 0,
+          privacy: c.is_public ? 'public' : 'private',
+        }))}
+        onOpenMarker={(m) => {
+          const marker = markersRef.current.find((x) => x.id === m.id)
+          setSelectedMarker(marker ?? null)
+        }}
+        onOpenCard={(c) => handleCardOpen(c.id)}
+        onCreateCard={() => setCreateCardOpen(true)}
       />
 
-      {selectedMarker && (
-        <RightDrawer
-          marker={selectedMarker}
-          onClose={handleCloseRight}
-          onShare={() => {}}
-          onDelete={() => {}}
-        />
-      )}
+      <MarkerDetailDrawer
+        marker={selectedMarker}
+        isOwner={isOwner}
+        onClose={() => setSelectedMarker(null)}
+      />
 
       <MapControls onLocate={handleLocate} onThemeChange={setMapTheme} mapRef={mapRef} />
       <HeatLegend />
       <FAB onClick={() => setCreateCardOpen(true)} />
 
-      {createCardOpen && <CreateCardModal onClose={() => setCreateCardOpen(false)} />}
+      {createCardOpen && (
+        <CreateCardModal
+          onClose={() => setCreateCardOpen(false)}
+          onCreated={handleCardCreated}
+        />
+      )}
     </div>
   )
 }
