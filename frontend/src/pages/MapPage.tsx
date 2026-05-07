@@ -96,6 +96,7 @@ export default function MapPage() {
           description: m.description,
           like_weight: m.like_weight,
           comment_count: m.comment_count,
+          created_at: m.created_at,
         }))}
         cards={cards.map((c) => ({
           id: c.id,
