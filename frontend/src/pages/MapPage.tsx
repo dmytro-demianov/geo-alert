@@ -56,7 +56,7 @@ export default function MapPage() {
   }, [])
 
   // Refetch cards after creating a new one
-  const handleCardCreated = useCallback(() => {
+  const handleCardCreated = useCallback((_card: Card) => {
     setCreateCardOpen(false)
     cardsApi.listPublic(50).then((res) => setCards(res.data.cards ?? [])).catch(() => {})
   }, [])

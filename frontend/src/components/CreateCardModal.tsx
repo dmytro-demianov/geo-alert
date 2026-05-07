@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { cardsApi, type CreateCardPayload } from '@/api/cards'
+import { cardsApi, type Card, type CreateCardPayload } from '@/api/cards'
 import Icon from './ui/Icon'
 
 interface Props {
   onClose: () => void
-  onCreated?: () => void
+  onCreated?: (card: Card) => void
 }
 
 export default function CreateCardModal({ onClose, onCreated }: Props) {
@@ -31,7 +31,7 @@ export default function CreateCardModal({ onClose, onCreated }: Props) {
       }
       const { data } = await cardsApi.create(payload)
       if (onCreated) {
-        onCreated()
+        onCreated(data)
       } else {
         onClose()
         navigate(`/cards/${data.id}`)
