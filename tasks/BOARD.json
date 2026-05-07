@@ -1027,6 +1027,20 @@
       "branch": null,
       "progress_notes": null,
       "error": null
+    },
+    "TASK-10.4": {
+      "title": "Remaining audit fixes: api/users.ts типы, SubscriptionsPage, WS disconnect, RightDrawer удалён",
+      "epic": "EPIC-10",
+      "agent": "frontend",
+      "status": "merged",
+      "depends_on": ["TASK-10.1", "TASK-10.3"],
+      "agent_instance": "agent-frontend-11",
+      "started_at": "2026-05-07T08:00:00Z",
+      "done_at": "2026-05-07T11:40:00Z",
+      "merged_at": "2026-05-07T11:40:00Z",
+      "branch": "feature/TASK-10.4-remaining-fixes",
+      "progress_notes": "done: api/users.ts — Subscription fields target_card_id/target_user_id, SubscriptionsResponse {cards,users}, subscribe payload; SubscriptionsPage.tsx создан (/subscriptions route); UserProfilePage + store/social.ts обновлены под новые типы; TopBar wsClient.disconnect() при logout + fix Підписки путь; MapPage currentUserId+created_by в LeftDrawer; RightDrawer.tsx удалён (dead code). tsc 0 ошибок, 17 тестов pass.",
+      "error": null
     }
   }
 }
