@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth'
 import { useCardsStore } from '@/store/cards'
-import CreateCardModal from '@/components/Cards/CreateCardModal'
+import CreateCardModal from '@/components/CreateCardModal'
 import { type Card } from '@/api/cards'
 
 function CardItem({ card, onDelete }: { card: Card; onDelete: (id: string) => void }) {
@@ -65,7 +65,7 @@ function CardItem({ card, onDelete }: { card: Card; onDelete: (id: string) => vo
 
 export default function MyCardsPage() {
   const user = useAuthStore((s) => s.user)
-  const { myCards, loading, error, fetchMyCards, createCard, deleteCard } = useCardsStore()
+  const { myCards, loading, error, fetchMyCards, deleteCard } = useCardsStore()
   const [showCreate, setShowCreate] = useState(false)
 
   useEffect(() => {
@@ -122,7 +122,10 @@ export default function MyCardsPage() {
       {showCreate && (
         <CreateCardModal
           onClose={() => setShowCreate(false)}
-          onCreate={createCard}
+          onCreated={(card) => {
+            setShowCreate(false)
+            useCardsStore.setState((s) => ({ myCards: [card, ...s.myCards] }))
+          }}
         />
       )}
     </div>

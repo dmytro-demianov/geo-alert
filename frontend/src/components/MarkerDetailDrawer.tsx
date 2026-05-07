@@ -618,7 +618,7 @@ export default function MarkerDetailDrawer({ marker, isOwner = false, onClose }:
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
-                    {(marker as MarkerData & { view_count?: number }).view_count ?? 0}
+                    {marker.view_count ?? 0}
                   </div>
                   <div className="text-[9px] font-bold tracking-widest uppercase text-slate-400">
                     переглядів

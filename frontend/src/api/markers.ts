@@ -44,6 +44,7 @@ export interface MarkerData {
   tags: string[]
   like_weight: number
   comment_count: number
+  view_count?: number
   allow_comments: boolean
   allow_likes: boolean
   is_draft: boolean
