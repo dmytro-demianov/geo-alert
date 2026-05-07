@@ -10,6 +10,7 @@ import FeedPage from '@/pages/FeedPage'
 import SearchPage from '@/pages/SearchPage'
 import MyCardsPage from '@/pages/MyCardsPage'
 import CardPage from '@/pages/CardPage'
+import SubscriptionsPage from '@/pages/SubscriptionsPage'
 import { ToastContainer } from '@/components/Toast'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { useAuthStore } from '@/store/auth'
@@ -60,6 +61,7 @@ export default function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/my-cards" element={<MyCardsPage />} />
           <Route path="/cards/:id" element={<CardPage />} />
+          <Route path="/subscriptions" element={<SubscriptionsPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

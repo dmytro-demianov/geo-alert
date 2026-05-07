@@ -230,7 +230,7 @@ function UserButton({ onLogin }: { onLogin: () => void }) {
     { label: 'Профіль', icon: 'user', path: user ? `/users/${user.id}` : '/' },
     { label: 'Стрічка активності', icon: 'list', path: '/feed' },
     { label: 'Мої позначки', icon: 'map-pin', path: '/my-cards' },
-    { label: 'Підписки', icon: 'heart', path: '/' },
+    { label: 'Підписки', icon: 'heart', path: '/subscriptions' },
     { label: 'Заблоковані', icon: 'alert-circle', path: '/settings/blocked' },
   ]
 
@@ -269,6 +269,7 @@ function UserButton({ onLogin }: { onLogin: () => void }) {
               onClick={() => {
                 setOpen(false)
                 logoutRequest().catch(() => {}).finally(() => {
+                  wsClient.disconnect()
                   logout()
                   navigate('/login', { replace: true })
                 })

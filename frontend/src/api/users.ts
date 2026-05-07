@@ -14,8 +14,9 @@ export interface UserProfile {
 
 export interface Subscription {
   id: string
-  card_id: string
   user_id: string
+  target_card_id?: string | null
+  target_user_id?: string | null
   created_at: string
   card?: Card
 }
@@ -36,7 +37,8 @@ export interface BlockedListResponse {
 }
 
 export interface SubscriptionsResponse {
-  subscriptions: Subscription[]
+  cards: Subscription[]
+  users: Subscription[]
 }
 
 export const usersApi = {
@@ -70,7 +72,7 @@ export const usersApi = {
 
 export const subscriptionsApi = {
   subscribe: (cardId: string) =>
-    apiClient.post<Subscription>('/subscriptions', { card_id: cardId }),
+    apiClient.post<Subscription>('/subscriptions', { target_card_id: cardId }),
 
   unsubscribe: (subscriptionId: string) =>
     apiClient.delete(`/subscriptions/${subscriptionId}`),
