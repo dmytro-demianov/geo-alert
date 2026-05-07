@@ -12,6 +12,7 @@ import MyCardsPage from '@/pages/MyCardsPage'
 import CardPage from '@/pages/CardPage'
 import SubscriptionsPage from '@/pages/SubscriptionsPage'
 import { ToastContainer } from '@/components/Toast'
+import AppSidebar from '@/components/AppSidebar'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { useAuthStore } from '@/store/auth'
 import { fetchMe } from '@/api/auth'
@@ -48,6 +49,7 @@ export default function App() {
       <AuthInit />
       <PushInit />
       <ToastContainer />
+      <AppSidebar />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />

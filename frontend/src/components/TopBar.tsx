@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/auth'
 import { logoutRequest } from '@/api/auth'
 import { notificationsApi, AppNotification } from '@/api/notifications'
 import { wsClient } from '@/ws/client'
+import { useSidebarStore, type SidebarPanel } from '@/store/sidebar'
 
 interface TopBarProps {
   onMenuToggle: () => void
@@ -204,6 +205,7 @@ function UserButton({ onLogin }: { onLogin: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const { user, isAuthenticated, logout } = useAuthStore()
+  const { openPanel } = useSidebarStore()
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -226,12 +228,15 @@ function UserButton({ onLogin }: { onLogin: () => void }) {
 
   const displayName = user?.display_name ?? 'Користувач'
 
-  const items: { label: string; icon: string; path: string }[] = [
+  const navItems: { label: string; icon: string; path: string }[] = [
     { label: 'Профіль', icon: 'user', path: user ? `/users/${user.id}` : '/' },
-    { label: 'Стрічка активності', icon: 'list', path: '/feed' },
-    { label: 'Мої позначки', icon: 'map-pin', path: '/my-cards' },
-    { label: 'Підписки', icon: 'heart', path: '/subscriptions' },
-    { label: 'Заблоковані', icon: 'alert-circle', path: '/settings/blocked' },
+  ]
+
+  const panelItems: { label: string; icon: string; panel: SidebarPanel }[] = [
+    { label: 'Стрічка активності', icon: 'list',          panel: 'feed' },
+    { label: 'Мої картки',         icon: 'map-pin',        panel: 'my-cards' },
+    { label: 'Підписки',           icon: 'heart',          panel: 'subscriptions' },
+    { label: 'Заблоковані',        icon: 'alert-circle',   panel: 'blocked' },
   ]
 
   return (
@@ -253,10 +258,22 @@ function UserButton({ onLogin }: { onLogin: () => void }) {
             </div>
           </div>
           <div className="p-1">
-            {items.map(({ label, icon, path }) => (
+            {/* Profile — full page navigation */}
+            {navItems.map(({ label, icon, path }) => (
               <button
                 key={label}
                 onClick={() => { setOpen(false); navigate(path) }}
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 text-[13px] text-slate-900 hover:bg-slate-50 rounded-md transition-colors text-left"
+              >
+                <Icon name={icon} size={14} stroke="#64748B" />
+                {label}
+              </button>
+            ))}
+            {/* Sidebar panels */}
+            {panelItems.map(({ label, icon, panel }) => (
+              <button
+                key={label}
+                onClick={() => { setOpen(false); openPanel(panel) }}
                 className="w-full flex items-center gap-2.5 px-2.5 py-2 text-[13px] text-slate-900 hover:bg-slate-50 rounded-md transition-colors text-left"
               >
                 <Icon name={icon} size={14} stroke="#64748B" />
