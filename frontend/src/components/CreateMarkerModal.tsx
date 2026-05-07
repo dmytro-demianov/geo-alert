@@ -182,7 +182,16 @@ export default function CreateMarkerModal({
     setSubmitting(true)
     setError(null)
     try {
-      const res = await markersApi.create(cardId, buildPayload())
+      const imageUrls: string[] = []
+      for (const preview of imagePreviews) {
+        const res = await markersApi.uploadPhoto(preview.file)
+        imageUrls.push(res.data.url)
+      }
+
+      const payload = buildPayload()
+      if (imageUrls.length > 0) payload.images = imageUrls
+
+      const res = await markersApi.create(cardId, payload)
       const marker = res.data
       setCreatedMarker(marker)
       if (marker.nearby_markers && marker.nearby_markers.length > 0) {
@@ -198,20 +207,20 @@ export default function CreateMarkerModal({
   }
 
   // Nearby dialog handlers
-  // _marker: the nearby marker the user chose to view; CardPage handles selection via onCreated callback
   const handleViewNearby = (_marker: MarkerData) => {
     onCreated(createdMarker!)
     onClose()
   }
 
-  const handleLikeNearby = (_marker: MarkerData) => {
-    // TODO: call likes API when TASK-2.3 is done
-    console.warn('TODO: like marker', _marker.id)
+  const handleLikeNearby = (marker: MarkerData) => {
+    markersApi.toggleLike(marker.id, 'LIKE').catch(() => {})
+    onCreated(createdMarker!)
+    onClose()
   }
 
   const handleCommentNearby = (_marker: MarkerData) => {
-    // TODO: open comments when TASK-2.4 is done
-    console.warn('TODO: comment marker', _marker.id)
+    onCreated(createdMarker!)
+    onClose()
   }
 
   const handleCreateOwn = () => {
@@ -368,9 +377,6 @@ export default function CreateMarkerModal({
                 className="w-full border-2 border-dashed border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors text-center"
               >
                 Выбрать фото
-                <span className="block text-xs text-gray-400 mt-0.5">
-                  (загрузка на сервер — TODO: Firebase Storage)
-                </span>
               </button>
               <input
                 ref={fileInputRef}
